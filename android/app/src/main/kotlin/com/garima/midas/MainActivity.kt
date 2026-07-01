@@ -1,0 +1,5 @@
+package com.garima.midas_flutter
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity : FlutterActivity()
