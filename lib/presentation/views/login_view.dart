@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:midas/app/theme/app_text_styles.dart';
 import 'package:midas/app/theme/app_theme.dart';
 import 'package:midas/presentation/controllers/login_controller.dart';
 import 'package:midas/presentation/widgets/domain_selection_dialog.dart';
@@ -20,16 +21,9 @@ class LoginView extends GetView<LoginController> {
               padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
               child: Column(
                 children: [
-                  const MidasToolbarLogo(height: 52),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'Login',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 46,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+                  const MidasToolbarLogo(height: 44),
+                  const SizedBox(height: 10),
+                  Text('Login', style: AppTextStyles.loginTitle()),
                 ],
               ),
             ),
@@ -106,18 +100,9 @@ class LoginView extends GetView<LoginController> {
                     children: [
                       Text(
                         'Version ${controller.version.value.isEmpty ? 'N/A' : controller.version.value}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.black54,
-                        ),
+                        style: AppTextStyles.footer(),
                       ),
-                      const Text(
-                        'Powered By G',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
+                      Text('Powered By G', style: AppTextStyles.footerBrand()),
                     ],
                   ),
                 ),

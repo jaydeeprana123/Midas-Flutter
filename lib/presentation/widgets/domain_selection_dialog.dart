@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:midas/app/theme/app_text_styles.dart';
 import 'package:midas/app/theme/app_theme.dart';
 import 'package:midas/presentation/controllers/login_controller.dart';
 
@@ -34,7 +35,7 @@ Future<void> showDomainSelectionDialog(LoginController controller) async {
                             onChanged: (v) {
                               if (v != null) tempValue.value = v;
                             },
-                            title: Text(domain.url),
+                            title: Text(domain.url, style: AppTextStyles.body()),
                             activeColor: AppTheme.primary,
                           ),
                         )
@@ -57,7 +58,7 @@ Future<void> showDomainSelectionDialog(LoginController controller) async {
             Obx(
               () => Text(
                 'Mac Address : ${controller.macAddress.value}',
-                style: const TextStyle(fontSize: 16),
+                style: AppTextStyles.body(color: Colors.black87),
               ),
             ),
           ],

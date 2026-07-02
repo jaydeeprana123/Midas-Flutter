@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:midas/app/constants/app_assets.dart';
+import 'package:midas/app/theme/app_text_styles.dart';
 import 'package:midas/app/theme/app_theme.dart';
 import 'package:midas/presentation/controllers/home_controller.dart';
 import 'package:midas/presentation/widgets/midas_toolbar_logo.dart';
@@ -21,7 +22,7 @@ class HomeView extends GetView<HomeController> {
             icon: const Icon(Icons.menu),
           ),
         ),
-        title: const MidasToolbarLogo(height: 40),
+        title: const MidasToolbarLogo(height: 36),
       ),
       drawer: Drawer(
         child: SafeArea(
@@ -36,8 +37,7 @@ class HomeView extends GetView<HomeController> {
                   children: [
                     Image.asset(AppAssets.splashLogo, width: 44, height: 44),
                     const SizedBox(width: 10),
-                    const Text('GSSPL',
-                        style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700)),
+                    Text('GSSPL', style: AppTextStyles.drawerHeader()),
                   ],
                 ),
               ),
@@ -58,8 +58,10 @@ class HomeView extends GetView<HomeController> {
               Center(
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 16),
-                  child: Text('Version ${version.isEmpty ? 'N/A' : version}',
-                      style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w600)),
+                  child: Text(
+                    'Version ${version.isEmpty ? 'N/A' : version}',
+                    style: AppTextStyles.version(),
+                  ),
                 ),
               ),
             ],
@@ -80,12 +82,7 @@ class HomeView extends GetView<HomeController> {
                         ? 'Asset Tracking and Management\nSystem'
                         : 'Equipment Maintenance Management\nSystem',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 26,
-                      fontWeight: FontWeight.w700,
-                      height: 1.1,
-                    ),
+                    style: AppTextStyles.screenTitle(),
                   ),
                   const SizedBox(height: 16),
                   Container(
@@ -94,9 +91,11 @@ class HomeView extends GetView<HomeController> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('User :', style: TextStyle(color: Colors.black54, fontSize: 20)),
-                        Text(orgLabel.isEmpty ? 'GSSPL' : orgLabel,
-                            style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w700)),
+                        Text('User :', style: AppTextStyles.userLabel()),
+                        Text(
+                          orgLabel.isEmpty ? 'GSSPL' : orgLabel,
+                          style: AppTextStyles.userValue(),
+                        ),
                       ],
                     ),
                   ),
@@ -170,7 +169,7 @@ class _TabHeader extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(color: selected ? AppTheme.primary : Colors.transparent, width: 3),
@@ -179,11 +178,9 @@ class _TabHeader extends StatelessWidget {
           child: Text(
             text,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: AppTextStyles.tabLabel(
               color: selected ? AppTheme.primary : Colors.black,
-              fontSize: 24,
-              letterSpacing: 2,
-              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              weight: selected ? FontWeight.w700 : FontWeight.w500,
             ),
           ),
         ),
@@ -202,7 +199,7 @@ class _DrawerItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: Icon(icon),
-      title: Text(label, style: const TextStyle(fontSize: 26)),
+      title: Text(label, style: AppTextStyles.drawerItem()),
       onTap: () {},
     );
   }
@@ -232,12 +229,12 @@ class _ActionCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 44, color: AppTheme.primary),
-          const SizedBox(height: 10),
+          Icon(icon, size: 36, color: AppTheme.primary),
+          const SizedBox(height: 8),
           Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w600),
+            style: AppTextStyles.cardTitle(),
           ),
         ],
       ),
