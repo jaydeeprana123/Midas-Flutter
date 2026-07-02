@@ -1,4 +1,4 @@
-package com.garima.midas_flutter
+package com.garima.midas
 
 import io.flutter.embedding.android.FlutterActivity
 
