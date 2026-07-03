@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
+import 'package:midas/Auth/auth_repository.dart';
+import 'package:midas/Shared/Models/app_permission_model.dart';
+import 'package:midas/Shared/Services/api_client.dart';
+import 'package:midas/Shared/Services/secure_storage_service.dart';
+import 'package:midas/Shared/Widgets/logout_confirmation_dialog.dart';
 import 'package:midas/app/constants/app_menu_config.dart';
 import 'package:midas/app/routes/app_routes.dart';
-import 'package:midas/data/models/app_permission.dart';
-import 'package:midas/data/repositories/auth_repository.dart';
-import 'package:midas/data/services/api_client.dart';
-import 'package:midas/data/services/secure_storage_service.dart';
-import 'package:midas/presentation/widgets/logout_confirmation_dialog.dart';
 
 class HomeController extends GetxController {
   HomeController({

@@ -5,6 +5,11 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+repositories {
+    // Resolves the local Zebra RFID SDK aar in app/libs.
+    flatDir { dirs("libs") }
+}
+
 android {
     namespace = "com.garima.midas"
     compileSdk = flutter.compileSdkVersion
@@ -41,4 +46,9 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // Zebra RFID SDK (com.zebra.rfid.api3) bundled as a local aar.
+    implementation(":API3_LIB-release-2.0.2.114@aar")
 }

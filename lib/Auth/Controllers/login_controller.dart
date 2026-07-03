@@ -1,15 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:midas/Auth/Models/domain_model.dart';
+import 'package:midas/Auth/Models/login_request_model.dart';
+import 'package:midas/Auth/auth_repository.dart';
+import 'package:midas/Auth/system_repository.dart';
+import 'package:midas/Shared/Services/api_client.dart';
+import 'package:midas/Shared/Services/device_service.dart';
+import 'package:midas/Shared/Services/local_storage_service.dart';
+import 'package:midas/Shared/Services/secure_storage_service.dart';
 import 'package:midas/app/routes/app_routes.dart';
-import 'package:midas/data/models/app_domain.dart';
-import 'package:midas/data/models/app_permission.dart';
-import 'package:midas/data/repositories/auth_repository.dart';
-import 'package:midas/data/repositories/system_repository.dart';
-import 'package:midas/data/services/api_client.dart';
-import 'package:midas/data/services/device_service.dart';
-import 'package:midas/data/services/local_storage_service.dart';
-import 'package:midas/data/services/secure_storage_service.dart';
 
 class LoginController extends GetxController {
   LoginController({
@@ -75,32 +75,38 @@ class LoginController extends GetxController {
     isLoading.value = true;
     try {
       final loginResponse = await authRepository.login(
-        username: usernameController.text.trim(),
-        password: passwordController.text,
-        macAddress: macAddress.value,
+        LoginRequestModel(
+          username: usernameController.text.trim(),
+          password: passwordController.text,
+          macAddress: macAddress.value,
+        ),
       );
-      final token = _extractToken(loginResponse);
-      if (token == null) {
+
+      final data = loginResponse.data;
+      if (data == null || data.token.isEmpty) {
         Get.snackbar(
           'Login Failed',
-          'Authentication token not received.',
+          loginResponse.message.isNotEmpty
+              ? loginResponse.message
+              : 'Authentication token not received.',
           snackPosition: SnackPosition.BOTTOM,
         );
         return;
       }
 
       final resolvedOrgLabel =
-          _extractOrgLabel(loginResponse) ?? orgLabel.value;
-      final permissions = AppPermission.listFromLoginResponse(loginResponse);
+          data.organizationName.isNotEmpty ? data.organizationName : orgLabel.value;
 
       await secureStorage.saveSession(
-        token: token,
+        token: data.token,
         username: usernameController.text.trim(),
         password: passwordController.text,
         orgLabel: resolvedOrgLabel,
-        permissions: permissions,
+        orgId: data.orgId,
+        userId: data.id,
+        permissions: data.applicationPermission,
       );
-      apiClient.setAuthToken(token);
+      apiClient.setAuthToken(data.token);
 
       Get.offAllNamed(
         AppRoutes.home,
@@ -132,7 +138,7 @@ class LoginController extends GetxController {
     }
   }
 
-  Future<List<AppDomain>> fetchDomains() => systemRepository.fetchDomains();
+  Future<List<DomainModel>> fetchDomains() => systemRepository.fetchDomains();
 
   Future<void> saveDomain(String url) async {
     final normalized = url.endsWith('/') ? url : '$url/';
@@ -144,31 +150,5 @@ class LoginController extends GetxController {
       version.value = org.version;
       orgLabel.value = org.organizationLabel;
     } catch (_) {}
-  }
-
-  String? _extractToken(Map<String, dynamic> response) {
-    final data = response['data'];
-    if (data is Map) {
-      final token = data['token'] ?? data['Token'];
-      if (token != null && token.toString().isNotEmpty) {
-        return token.toString();
-      }
-    }
-    return null;
-  }
-
-  String? _extractOrgLabel(Map<String, dynamic> response) {
-    final data = response['data'];
-    if (data is Map) {
-      final label =
-          data['name'] ??
-          data['organizationName'] ??
-          data['OrganizationName'] ??
-          data['orgLabel'];
-      if (label != null && label.toString().isNotEmpty) {
-        return label.toString();
-      }
-    }
-    return null;
   }
 }

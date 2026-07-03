@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:midas/data/models/app_permission.dart';
+import 'package:midas/Shared/Models/app_permission_model.dart';
 
 class SecureStorageService {
   SecureStorageService({FlutterSecureStorage? storage})
@@ -16,6 +16,8 @@ class SecureStorageService {
   static const _keyUsername = 'username';
   static const _keyPassword = 'password';
   static const _keyOrgLabel = 'orgLabel';
+  static const _keyOrgId = 'orgId';
+  static const _keyUserId = 'userId';
   static const _keyPermissions = 'permissions';
 
   Future<String?> get token => _storage.read(key: _keyToken);
@@ -25,6 +27,16 @@ class SecureStorageService {
   Future<String?> get password => _storage.read(key: _keyPassword);
 
   Future<String?> get orgLabel => _storage.read(key: _keyOrgLabel);
+
+  Future<int?> get orgId async {
+    final raw = await _storage.read(key: _keyOrgId);
+    return raw == null ? null : int.tryParse(raw);
+  }
+
+  Future<int?> get userId async {
+    final raw = await _storage.read(key: _keyUserId);
+    return raw == null ? null : int.tryParse(raw);
+  }
 
   Future<bool> hasActiveSession() async {
     final savedToken = await token;
@@ -36,6 +48,8 @@ class SecureStorageService {
     required String username,
     required String password,
     required String orgLabel,
+    int? orgId,
+    int? userId,
     List<AppPermission> permissions = const [],
   }) async {
     await Future.wait([
@@ -43,6 +57,8 @@ class SecureStorageService {
       _storage.write(key: _keyUsername, value: username),
       _storage.write(key: _keyPassword, value: password),
       _storage.write(key: _keyOrgLabel, value: orgLabel),
+      _storage.write(key: _keyOrgId, value: (orgId ?? 0).toString()),
+      _storage.write(key: _keyUserId, value: (userId ?? 0).toString()),
       savePermissions(permissions),
     ]);
   }
@@ -72,6 +88,8 @@ class SecureStorageService {
       _storage.delete(key: _keyUsername),
       _storage.delete(key: _keyPassword),
       _storage.delete(key: _keyOrgLabel),
+      _storage.delete(key: _keyOrgId),
+      _storage.delete(key: _keyUserId),
       _storage.delete(key: _keyPermissions),
     ]);
   }

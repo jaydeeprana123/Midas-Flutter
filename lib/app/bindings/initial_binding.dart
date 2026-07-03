@@ -1,11 +1,13 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:midas/data/repositories/auth_repository.dart';
-import 'package:midas/data/repositories/system_repository.dart';
-import 'package:midas/data/services/api_client.dart';
-import 'package:midas/data/services/device_service.dart';
-import 'package:midas/data/services/local_storage_service.dart';
-import 'package:midas/data/services/secure_storage_service.dart';
+import 'package:midas/AssetTag/asset_repository.dart';
+import 'package:midas/Auth/auth_repository.dart';
+import 'package:midas/Auth/system_repository.dart';
+import 'package:midas/Shared/Services/api_client.dart';
+import 'package:midas/Shared/Services/device_service.dart';
+import 'package:midas/Shared/Services/local_storage_service.dart';
+import 'package:midas/Shared/Services/rfid_service.dart';
+import 'package:midas/Shared/Services/secure_storage_service.dart';
 
 class InitialBinding extends Bindings {
   @override
@@ -20,6 +22,8 @@ class InitialBinding extends Bindings {
     Get.put<ApiClient>(apiClient, permanent: true);
     Get.put<SystemRepository>(SystemRepository(apiClient), permanent: true);
     Get.put<AuthRepository>(AuthRepository(apiClient), permanent: true);
+    Get.put<AssetRepository>(AssetRepository(apiClient), permanent: true);
     Get.put<DeviceService>(DeviceService(), permanent: true);
+    Get.put<RfidService>(RfidService(), permanent: true);
   }
 }

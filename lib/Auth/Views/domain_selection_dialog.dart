@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:midas/Auth/Controllers/login_controller.dart';
 import 'package:midas/app/theme/app_text_styles.dart';
 import 'package:midas/app/theme/app_theme.dart';
-import 'package:midas/presentation/controllers/login_controller.dart';
 
 Future<void> showDomainSelectionDialog(LoginController controller) async {
   final domains = await controller.fetchDomains();

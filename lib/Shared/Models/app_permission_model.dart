@@ -1,3 +1,10 @@
+import 'dart:convert';
+
+AppPermission appPermissionFromJson(String str) =>
+    AppPermission.fromJson(json.decode(str));
+
+String appPermissionToJson(AppPermission data) => json.encode(data.toJson());
+
 class AppPermission {
   const AppPermission({
     required this.label,
@@ -24,21 +31,6 @@ class AppPermission {
         'module': module,
         'isDeleted': isDeleted,
       };
-
-  static List<AppPermission> listFromLoginResponse(Map<String, dynamic> response) {
-    final data = response['data'] ?? response['Data'];
-    if (data is! Map) return [];
-
-    final permissions =
-        data['applicationPermission'] ?? data['ApplicationPermission'];
-    if (permissions is! List) return [];
-
-    return permissions
-        .whereType<Map>()
-        .map((item) => AppPermission.fromJson(Map<String, dynamic>.from(item)))
-        .where((permission) => permission.isActive)
-        .toList();
-  }
 
   static int? _readInt(dynamic value) {
     if (value is int) return value;

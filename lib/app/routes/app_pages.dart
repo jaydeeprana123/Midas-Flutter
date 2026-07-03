@@ -1,17 +1,23 @@
 import 'package:get/get.dart';
+import 'package:midas/AssetTag/Controllers/asset_search_controller.dart';
+import 'package:midas/AssetTag/Controllers/assign_asset_tag_controller.dart';
+import 'package:midas/AssetTag/Views/asset_search_view.dart';
+import 'package:midas/AssetTag/Views/assign_asset_tag_view.dart';
+import 'package:midas/AssetTag/asset_repository.dart';
+import 'package:midas/Auth/Controllers/login_controller.dart';
+import 'package:midas/Auth/Controllers/splash_controller.dart';
+import 'package:midas/Auth/Views/login_view.dart';
+import 'package:midas/Auth/Views/splash_view.dart';
+import 'package:midas/Auth/auth_repository.dart';
+import 'package:midas/Auth/system_repository.dart';
+import 'package:midas/Home/Controllers/home_controller.dart';
+import 'package:midas/Home/Views/home_view.dart';
+import 'package:midas/Shared/Services/api_client.dart';
+import 'package:midas/Shared/Services/device_service.dart';
+import 'package:midas/Shared/Services/local_storage_service.dart';
+import 'package:midas/Shared/Services/rfid_service.dart';
+import 'package:midas/Shared/Services/secure_storage_service.dart';
 import 'package:midas/app/routes/app_routes.dart';
-import 'package:midas/data/repositories/auth_repository.dart';
-import 'package:midas/data/repositories/system_repository.dart';
-import 'package:midas/data/services/api_client.dart';
-import 'package:midas/data/services/device_service.dart';
-import 'package:midas/data/services/local_storage_service.dart';
-import 'package:midas/data/services/secure_storage_service.dart';
-import 'package:midas/presentation/controllers/home_controller.dart';
-import 'package:midas/presentation/controllers/login_controller.dart';
-import 'package:midas/presentation/controllers/splash_controller.dart';
-import 'package:midas/presentation/views/home_view.dart';
-import 'package:midas/presentation/views/login_view.dart';
-import 'package:midas/presentation/views/splash_view.dart';
 
 class AppPages {
   static final pages = <GetPage>[
@@ -53,6 +59,31 @@ class AppPages {
             authRepository: Get.find<AuthRepository>(),
             secureStorage: Get.find<SecureStorageService>(),
             apiClient: Get.find<ApiClient>(),
+          ),
+        );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.assignAssetTag,
+      page: () => const AssignAssetTagView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => AssignAssetTagController(
+            assetRepository: Get.find<AssetRepository>(),
+            secureStorage: Get.find<SecureStorageService>(),
+            rfidService: Get.find<RfidService>(),
+          ),
+        );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.assetSearch,
+      page: () => const AssetSearchView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => AssetSearchController(
+            assetRepository: Get.find<AssetRepository>(),
+            secureStorage: Get.find<SecureStorageService>(),
           ),
         );
       }),

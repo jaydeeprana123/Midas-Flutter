@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:midas/Auth/Controllers/splash_controller.dart';
 import 'package:midas/app/constants/app_assets.dart';
 import 'package:midas/app/theme/app_theme.dart';
-import 'package:midas/presentation/controllers/splash_controller.dart';
 
 class SplashView extends GetView<SplashController> {
   const SplashView({super.key});

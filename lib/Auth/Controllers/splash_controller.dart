@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
+import 'package:midas/Auth/system_repository.dart';
+import 'package:midas/Shared/Services/api_client.dart';
+import 'package:midas/Shared/Services/secure_storage_service.dart';
 import 'package:midas/app/routes/app_routes.dart';
-import 'package:midas/data/repositories/system_repository.dart';
-import 'package:midas/data/services/api_client.dart';
-import 'package:midas/data/services/secure_storage_service.dart';
 
 class SplashController extends GetxController {
   SplashController({

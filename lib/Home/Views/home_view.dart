@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:midas/Home/Controllers/home_controller.dart';
+import 'package:midas/Shared/Widgets/midas_toolbar_logo.dart';
 import 'package:midas/app/constants/app_assets.dart';
 import 'package:midas/app/theme/app_text_styles.dart';
 import 'package:midas/app/theme/app_theme.dart';
-import 'package:midas/presentation/controllers/home_controller.dart';
-import 'package:midas/presentation/widgets/midas_toolbar_logo.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
@@ -53,7 +53,16 @@ class HomeView extends GetView<HomeController> {
                   label: 'Dashboard',
                 ),
                 ...controller.drawerMenuItems.map(
-                  (item) => _DrawerItem(icon: item.icon, label: item.title),
+                  (item) => _DrawerItem(
+                    icon: item.icon,
+                    label: item.title,
+                    onTap: item.route == null
+                        ? null
+                        : () {
+                            Navigator.of(context).pop();
+                            Get.toNamed(item.route!);
+                          },
+                  ),
                 ),
                 _DrawerItem(
                   icon: Icons.logout,
@@ -153,16 +162,20 @@ class HomeView extends GetView<HomeController> {
                         ),
                       )
                     : Padding(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                         child: GridView.count(
                           crossAxisCount: 2,
                           mainAxisSpacing: 14,
                           crossAxisSpacing: 14,
+                          childAspectRatio: 1.2, // width : height
                           children: currentItems
                               .map(
                                 (item) => _ActionCard(
                                   icon: item.icon,
                                   title: item.title,
+                                  onTap: item.route == null
+                                      ? null
+                                      : () => Get.toNamed(item.route!),
                                 ),
                               )
                               .toList(),
@@ -239,37 +252,50 @@ class _DrawerItem extends StatelessWidget {
 }
 
 class _ActionCard extends StatelessWidget {
-  const _ActionCard({required this.icon, required this.title});
+  const _ActionCard({required this.icon, required this.title, this.onTap});
 
   final IconData icon;
   final String title;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Card(
+      elevation: 10,
+      color: Colors.white,
+      shadowColor: Colors.black.withOpacity(0.1),
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 36, color: AppTheme.primary),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: AppTextStyles.cardTitle(),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.08),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-        ],
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 50, color: AppTheme.primary),
+              const SizedBox(height: 8),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: AppTextStyles.cardTitle(),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

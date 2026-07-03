@@ -1,25 +1,26 @@
-import 'package:midas/data/models/app_domain.dart';
-import 'package:midas/data/models/org_info.dart';
-import 'package:midas/data/services/api_client.dart';
+import 'package:midas/Auth/Models/domain_model.dart';
+import 'package:midas/Auth/Models/system_version_model.dart';
+import 'package:midas/Shared/Services/api_client.dart';
 
 class SystemRepository {
   SystemRepository(this._apiClient);
 
   final ApiClient _apiClient;
 
-  Future<OrgInfo> fetchSystemVersionAndLabel() async {
-    final json = await _apiClient.get('/api/Organization/GetSystemVersionAndOrgLabel');
+  Future<SystemVersionModel> fetchSystemVersionAndLabel() async {
+    final json =
+        await _apiClient.get('/api/Organization/GetSystemVersionAndOrgLabel');
     final data = _extractData(json);
-    return OrgInfo.fromJson(data);
+    return SystemVersionModel.fromJson(data);
   }
 
-  Future<List<AppDomain>> fetchDomains() async {
+  Future<List<DomainModel>> fetchDomains() async {
     final json = await _apiClient.get('/api/Login/GetAllDomains');
     final data = _extractData(json);
     final domains = data['domains'] ?? data['Domains'] ?? data;
     if (domains is List) {
       return domains
-          .map((e) => AppDomain.fromDynamic(e))
+          .map((e) => DomainModel.fromDynamic(e))
           .where((e) => e.url.trim().isNotEmpty)
           .toList();
     }
@@ -27,7 +28,8 @@ class SystemRepository {
   }
 
   Map<String, dynamic> _extractData(Map<String, dynamic> root) {
-    final data = root['data'] ?? root['result'] ?? root['Data'] ?? root['Result'] ?? root;
+    final data =
+        root['data'] ?? root['result'] ?? root['Data'] ?? root['Result'] ?? root;
     if (data is Map<String, dynamic>) return data;
     if (data is Map) return Map<String, dynamic>.from(data);
     return root;

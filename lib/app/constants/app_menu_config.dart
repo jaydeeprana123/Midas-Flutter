@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:midas/app/routes/app_routes.dart';
 
 enum AppMenuSection { assets, equipments }
 
@@ -10,6 +11,7 @@ class AppMenuItem {
     required this.section,
     this.showInDrawer = true,
     this.showOnHome = true,
+    this.route,
   });
 
   final String permissionLabel;
@@ -18,6 +20,10 @@ class AppMenuItem {
   final AppMenuSection section;
   final bool showInDrawer;
   final bool showOnHome;
+
+  /// Named route to open when this menu item is tapped. `null` means the
+  /// feature is not wired up yet.
+  final String? route;
 }
 
 class AppMenuConfig {
@@ -37,6 +43,7 @@ class AppMenuConfig {
       title: 'Assign Asset Tag',
       icon: Icons.qr_code_scanner,
       section: AppMenuSection.assets,
+      route: AppRoutes.assignAssetTag,
     ),
     AppMenuItem(
       permissionLabel: 'DeAssign QR Asset',

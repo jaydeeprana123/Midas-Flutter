@@ -32,6 +32,14 @@ class ApiClient {
     return _toMap(response.data);
   }
 
+  Future<Map<String, dynamic>> getWithQuery(
+    String path, {
+    Map<String, dynamic>? queryParameters,
+  }) async {
+    final response = await _dio.get(path, queryParameters: queryParameters);
+    return _toMap(response.data);
+  }
+
   Future<Map<String, dynamic>> post(
     String path, {
     Map<String, dynamic>? body,
