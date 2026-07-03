@@ -19,6 +19,14 @@ class ApiClient {
     _dio.options.baseUrl = baseUrl;
   }
 
+  void setAuthToken(String? token) {
+    if (token == null || token.isEmpty) {
+      _dio.options.headers.remove('Authorization');
+      return;
+    }
+    _dio.options.headers['Authorization'] = 'Bearer $token';
+  }
+
   Future<Map<String, dynamic>> get(String path) async {
     final response = await _dio.get(path);
     return _toMap(response.data);

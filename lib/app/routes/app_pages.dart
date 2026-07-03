@@ -5,6 +5,7 @@ import 'package:midas/data/repositories/system_repository.dart';
 import 'package:midas/data/services/api_client.dart';
 import 'package:midas/data/services/device_service.dart';
 import 'package:midas/data/services/local_storage_service.dart';
+import 'package:midas/data/services/secure_storage_service.dart';
 import 'package:midas/presentation/controllers/home_controller.dart';
 import 'package:midas/presentation/controllers/login_controller.dart';
 import 'package:midas/presentation/controllers/splash_controller.dart';
@@ -18,7 +19,13 @@ class AppPages {
       name: AppRoutes.splash,
       page: () => const SplashView(),
       binding: BindingsBuilder(() {
-        Get.put(SplashController(Get.find<SystemRepository>()));
+        Get.put(
+          SplashController(
+            systemRepository: Get.find<SystemRepository>(),
+            secureStorage: Get.find<SecureStorageService>(),
+            apiClient: Get.find<ApiClient>(),
+          ),
+        );
       }),
     ),
     GetPage(
@@ -31,6 +38,7 @@ class AppPages {
             systemRepository: Get.find<SystemRepository>(),
             deviceService: Get.find<DeviceService>(),
             storageService: Get.find<LocalStorageService>(),
+            secureStorage: Get.find<SecureStorageService>(),
             apiClient: Get.find<ApiClient>(),
           ),
         );
@@ -40,7 +48,13 @@ class AppPages {
       name: AppRoutes.home,
       page: () => const HomeView(),
       binding: BindingsBuilder(() {
-        Get.lazyPut(() => HomeController());
+        Get.lazyPut(
+          () => HomeController(
+            authRepository: Get.find<AuthRepository>(),
+            secureStorage: Get.find<SecureStorageService>(),
+            apiClient: Get.find<ApiClient>(),
+          ),
+        );
       }),
     ),
   ];

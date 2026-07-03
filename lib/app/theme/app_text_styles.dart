@@ -62,17 +62,21 @@ abstract class AppTextStyles {
       _style(fontSize: 16, fontWeight: FontWeight.w700, color: color);
 
   static TextTheme textTheme(TextTheme base) {
-    return base.apply(fontFamily: fontFamily).copyWith(
-      displayLarge: _style(fontSize: 32, fontWeight: FontWeight.w700),
-      headlineMedium: _style(fontSize: 18, fontWeight: FontWeight.w700),
-      titleLarge: _style(fontSize: 16, fontWeight: FontWeight.w600),
-      titleMedium: _style(fontSize: 15, fontWeight: FontWeight.w600),
-      bodyLarge: _style(fontSize: 15, fontWeight: FontWeight.w400),
-      bodyMedium: _style(fontSize: 14, fontWeight: FontWeight.w400),
-      bodySmall: _style(fontSize: 13, fontWeight: FontWeight.w400),
-      labelLarge: _style(fontSize: 16, fontWeight: FontWeight.w700),
-      labelMedium: _style(fontSize: 14, fontWeight: FontWeight.w500),
-      labelSmall: _style(fontSize: 12, fontWeight: FontWeight.w500),
+    return base.apply(
+      fontFamily: fontFamily,
+      bodyColor: Colors.black87,
+      displayColor: Colors.black87,
+    ).copyWith(
+      displayLarge: _style(fontSize: 32, fontWeight: FontWeight.w700, color: Colors.black87),
+      headlineMedium: _style(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.black87),
+      titleLarge: _style(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
+      titleMedium: _style(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black87),
+      bodyLarge: _style(fontSize: 15, fontWeight: FontWeight.w400, color: Colors.black87),
+      bodyMedium: _style(fontSize: 14, fontWeight: FontWeight.w400, color: Colors.black87),
+      bodySmall: _style(fontSize: 13, fontWeight: FontWeight.w400, color: Colors.black54),
+      labelLarge: _style(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.black87),
+      labelMedium: _style(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.black87),
+      labelSmall: _style(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.black54),
     );
   }
 }

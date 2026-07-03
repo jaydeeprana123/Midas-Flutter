@@ -19,4 +19,8 @@ class AuthRepository {
       },
     );
   }
+
+  Future<Map<String, dynamic>> logout() {
+    return _apiClient.get('/api/Login/Logout');
+  }
 }

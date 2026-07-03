@@ -16,7 +16,7 @@ class SplashView extends GetView<SplashController> {
       backgroundColor: AppTheme.primaryDark,
       body: Center(
         child: Image.asset(
-          AppAssets.splashLogo,
+          AppAssets.appIcon,
           width: 180,
           height: 180,
         ),

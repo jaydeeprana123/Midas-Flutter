@@ -10,13 +10,22 @@ class AppTheme {
 
   static ThemeData lightTheme() {
     final base = ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: primary),
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: primary,
+        brightness: Brightness.light,
+      ),
       scaffoldBackgroundColor: scaffold,
       useMaterial3: true,
     );
 
     return base.copyWith(
       textTheme: AppTextStyles.textTheme(base.textTheme),
+      primaryColor: primary,
+      textSelectionTheme: const TextSelectionThemeData(
+        cursorColor: primary,
+        selectionColor: Color(0x334A23A8),
+        selectionHandleColor: primary,
+      ),
       appBarTheme: AppBarTheme(
         backgroundColor: primary,
         foregroundColor: Colors.white,
@@ -38,6 +47,8 @@ class AppTheme {
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         hintStyle: AppTextStyles.body(color: Colors.black38),
         labelStyle: AppTextStyles.body(color: Colors.black54),
+        prefixIconColor: Colors.black54,
+        suffixIconColor: Colors.black54,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: const BorderSide(color: Color(0xFFC3C3C3)),

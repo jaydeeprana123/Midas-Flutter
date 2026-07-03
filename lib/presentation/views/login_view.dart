@@ -47,6 +47,7 @@ class LoginView extends GetView<LoginController> {
                     children: [
                       TextField(
                         controller: controller.usernameController,
+                        style: AppTextStyles.body(color: Colors.black87),
                         decoration: const InputDecoration(
                           hintText: 'User Name',
                           prefixIcon: Icon(Icons.person),
@@ -57,6 +58,7 @@ class LoginView extends GetView<LoginController> {
                         () => TextField(
                           controller: controller.passwordController,
                           obscureText: controller.obscurePassword.value,
+                          style: AppTextStyles.body(color: Colors.black87),
                           decoration: InputDecoration(
                             hintText: 'Password',
                             prefixIcon: const Icon(Icons.lock),
