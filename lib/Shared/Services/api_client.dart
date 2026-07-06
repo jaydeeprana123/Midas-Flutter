@@ -1,19 +1,51 @@
 import 'package:dio/dio.dart';
 
+typedef UnauthorizedCallback = Future<void> Function();
+
 class ApiClient {
-  ApiClient({required String baseUrl})
-      : _dio = Dio(
-          BaseOptions(
-            baseUrl: baseUrl,
-            connectTimeout: const Duration(seconds: 25),
-            receiveTimeout: const Duration(seconds: 25),
-            headers: const {'Content-Type': 'application/json'},
-          ),
-        );
+  ApiClient({required String baseUrl}) : _dio = _createDio(baseUrl) {
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onError: (error, handler) async {
+          await _handleUnauthorized(error);
+          handler.next(error);
+        },
+      ),
+    );
+  }
 
   final Dio _dio;
+  UnauthorizedCallback? _onUnauthorized;
 
   Dio get dio => _dio;
+
+  static Dio _createDio(String baseUrl) {
+    return Dio(
+      BaseOptions(
+        baseUrl: baseUrl,
+        connectTimeout: const Duration(seconds: 25),
+        receiveTimeout: const Duration(seconds: 25),
+        headers: const {'Content-Type': 'application/json'},
+      ),
+    );
+  }
+
+  void setUnauthorizedHandler(UnauthorizedCallback handler) {
+    _onUnauthorized = handler;
+  }
+
+  Future<void> _handleUnauthorized(DioException error) async {
+    if (error.response?.statusCode != 401) return;
+
+    final path = error.requestOptions.path.toLowerCase();
+    if (path.contains('/api/login/loginauthentication')) return;
+
+    final hasAuthHeader =
+        error.requestOptions.headers.containsKey('Authorization');
+    if (!hasAuthHeader) return;
+
+    await _onUnauthorized?.call();
+  }
 
   void setBaseUrl(String baseUrl) {
     _dio.options.baseUrl = baseUrl;

@@ -65,6 +65,7 @@ class AppMenuConfig {
       title: AppStrings.changeLocationByLocation,
       icon: Icons.sync,
       section: AppMenuSection.assets,
+      route: AppRoutes.changeLocationByLocation,
     ),
     AppMenuItem(
       permissionLabel: 'Change Location By Asset',

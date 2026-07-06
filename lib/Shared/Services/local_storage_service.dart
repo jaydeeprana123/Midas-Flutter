@@ -10,4 +10,6 @@ class LocalStorageService {
   String? get baseUrl => _box.read<String>(_keyBaseUrl);
 
   Future<void> saveBaseUrl(String url) => _box.write(_keyBaseUrl, url);
+
+  Future<void> clearAll() => _box.erase();
 }

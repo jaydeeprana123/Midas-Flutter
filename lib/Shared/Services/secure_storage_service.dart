@@ -93,4 +93,6 @@ class SecureStorageService {
       _storage.delete(key: _keyPermissions),
     ]);
   }
+
+  Future<void> clearAll() => _storage.deleteAll();
 }

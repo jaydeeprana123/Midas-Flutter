@@ -29,8 +29,7 @@ class AppStrings {
   static const removeAsset = 'Remove asset';
 
   // System titles
-  static const assetTrackingSystem =
-      'Asset Tracking and Management\nSystem';
+  static const assetTrackingSystem = 'Asset Tracking and Management\nSystem';
   static const equipmentMaintenanceSystem =
       'Equipment Maintenance Management\nSystem';
 
@@ -67,8 +66,7 @@ class AppStrings {
   static const identifyEquipment = 'Identify Equipment';
 
   // Logout dialog
-  static const logoutConfirmation =
-      'Are you sure you want to logout?';
+  static const logoutConfirmation = 'Are you sure you want to logout?';
   static const logoutFailed = 'Logout Failed';
   static const unableToLogout = 'Unable to logout.';
   static const unableToLogoutRetry = 'Unable to logout. Please try again.';
@@ -76,8 +74,7 @@ class AppStrings {
   // QR scanner
   static const scanQrBarcode = 'Scan QR / Barcode';
   static const unableToStartCamera = 'Unable to start camera.';
-  static const alignQrWithinFrame =
-      'Align the QR / barcode within the frame';
+  static const alignQrWithinFrame = 'Align the QR / barcode within the frame';
 
   // Asset search
   static const typeToSearchAssets = 'Type to search assets.';
@@ -88,7 +85,8 @@ class AppStrings {
   static const assignFailed = 'Assign Failed';
   static const tagAssignedSuccessfully = 'Tag assigned successfully.';
   static const unableToAssignTag = 'Unable to assign tag.';
-  static const unableToAssignTagRetry = 'Unable to assign tag. Please try again.';
+  static const unableToAssignTagRetry =
+      'Unable to assign tag. Please try again.';
   static const assetRequired = 'Asset Required';
   static const selectAssetNameOrCode =
       'Please select an asset name or asset code.';
@@ -112,7 +110,8 @@ class AppStrings {
   // Assign location tag
   static const assignLocationWithAsset = 'Assign Location with Asset';
   static const assetQrRequired = 'Asset QR Required';
-  static const enterAssetQrRfid = 'Please scan or enter an asset QR / RFID value.';
+  static const enterAssetQrRfid =
+      'Please scan or enter an asset QR / RFID value.';
   static const duplicateAsset = 'Duplicate Asset';
   static const assetTagAlreadyInList = 'This asset tag is already in the list.';
   static const locationRequired = 'Location Required';
@@ -124,6 +123,35 @@ class AppStrings {
   static const unableToAssignLocation = 'Unable to assign location.';
   static const unableToAssignLocationRetry =
       'Unable to assign location. Please try again.';
+
+  // Change location by location
+  static const scanSourceLocation = 'Scan Source Location QR';
+  static const scanDestinationLocationQr = 'Scan Destination Location QR';
+  static const shift = 'Shift';
+  static const transit = 'Transit';
+  static const remarks = 'Remarks';
+  static const selectRemarks = 'Select Remarks';
+  static const assetNameOrTagCode = 'Asset name or Tag code';
+  static const assetsDetails = 'Assets Details :';
+  static const change = 'Change';
+  static const changeTypeRequired = 'Change Type Required';
+  static const selectShiftOrTransit = 'Please select Shift or Transit.';
+  static const remarkRequired = 'Remark Required';
+  static const selectRemarkFromDropdown = 'Please select a remark.';
+  static const selectAtLeastOneAsset = 'Please select at least one asset.';
+  static const destinationLocationRequired = 'Destination Location Required';
+  static const enterDestinationLocationQrRfid =
+      'Please scan or enter a destination location QR / RFID value.';
+  static const changeLocationFailed = 'Change Failed';
+  static const locationChangedSuccessfully = 'Location changed successfully.';
+  static const unableToChangeLocation = 'Unable to change location.';
+  static const unableToChangeLocationRetry =
+      'Unable to change location. Please try again.';
+  static const unableToFetchLocationDetails =
+      'Unable to fetch location details.';
+  static const unableToFetchLocationDetailsRetry =
+      'Unable to fetch location details. Please try again.';
+  static const noAssetsAtLocation = 'No assets found at this location.';
 
   // Shared validation / snackbars
   static const qrRfidRequired = 'QR / RFID Required';
