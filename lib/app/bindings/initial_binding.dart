@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:midas/AssetTag/asset_repository.dart';
+import 'package:midas/Location/location_repository.dart';
 import 'package:midas/Auth/auth_repository.dart';
 import 'package:midas/Auth/system_repository.dart';
 import 'package:midas/Shared/Services/api_client.dart';
@@ -23,6 +24,7 @@ class InitialBinding extends Bindings {
     Get.put<SystemRepository>(SystemRepository(apiClient), permanent: true);
     Get.put<AuthRepository>(AuthRepository(apiClient), permanent: true);
     Get.put<AssetRepository>(AssetRepository(apiClient), permanent: true);
+    Get.put<LocationRepository>(LocationRepository(apiClient), permanent: true);
     Get.put<DeviceService>(DeviceService(), permanent: true);
     Get.put<RfidService>(RfidService(), permanent: true);
   }

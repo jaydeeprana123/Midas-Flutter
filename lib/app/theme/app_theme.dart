@@ -44,9 +44,11 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white,
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         hintStyle: AppTextStyles.body(color: Colors.black38),
         labelStyle: AppTextStyles.body(color: Colors.black54),
+        floatingLabelStyle: AppTextStyles.body(color: AppTheme.primary),
         prefixIconColor: Colors.black54,
         suffixIconColor: Colors.black54,
         border: OutlineInputBorder(

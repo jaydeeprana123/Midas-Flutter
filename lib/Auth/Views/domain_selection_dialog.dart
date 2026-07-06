@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:midas/Auth/Controllers/login_controller.dart';
+import 'package:midas/app/constants/app_strings.dart';
 import 'package:midas/app/theme/app_text_styles.dart';
 import 'package:midas/app/theme/app_theme.dart';
 
@@ -9,7 +10,7 @@ Future<void> showDomainSelectionDialog(LoginController controller) async {
   final tempValue = controller.selectedDomain.value.obs;
 
   if (domains.isEmpty) {
-    Get.snackbar('No Domains', 'No domain list returned from server.',
+    Get.snackbar(AppStrings.noDomains, AppStrings.noDomainListReturned,
         snackPosition: SnackPosition.BOTTOM);
     return;
   }
@@ -52,12 +53,12 @@ Future<void> showDomainSelectionDialog(LoginController controller) async {
                 }
                 Get.back();
               },
-              child: const Text('Save'),
+              child: const Text(AppStrings.save),
             ),
             const SizedBox(height: 12),
             Obx(
               () => Text(
-                'Mac Address : ${controller.macAddress.value}',
+                AppStrings.macAddress(controller.macAddress.value),
                 style: AppTextStyles.body(color: Colors.black87),
               ),
             ),

@@ -3,53 +3,44 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:midas/AssetTag/Models/asset_link_tag_model.dart';
-import 'package:midas/AssetTag/Models/stock_in_request_model.dart';
+import 'package:midas/AssetTag/Models/identity_asset_model.dart';
 import 'package:midas/AssetTag/Views/qr_scanner_view.dart';
+import 'package:midas/app/constants/app_strings.dart';
 import 'package:midas/AssetTag/asset_repository.dart';
 import 'package:midas/Shared/Services/rfid_service.dart';
-import 'package:midas/Shared/Services/secure_storage_service.dart';
-import 'package:midas/app/constants/app_strings.dart';
-import 'package:midas/app/routes/app_routes.dart';
 
-class AssignAssetTagController extends GetxController {
-  AssignAssetTagController({
+class DeassignAssetTagController extends GetxController {
+  DeassignAssetTagController({
     required this.assetRepository,
-    required this.secureStorage,
     required this.rfidService,
   });
 
   final AssetRepository assetRepository;
-  final SecureStorageService secureStorage;
   final RfidService rfidService;
 
   final tagController = TextEditingController();
-  final assetController = TextEditingController();
-  final serialController = TextEditingController();
 
-  final selectedAssetId = Rxn<int>();
-  final isSubmitting = false.obs;
+  final identityAsset = Rxn<IdentityAssetModel>();
+  final isFetching = false.obs;
+  final isDeassigning = false.obs;
   final isRfidConnected = false.obs;
 
-  int _orgId = 0;
-  int _userId = 0;
   StreamSubscription<String>? _tagSubscription;
 
   @override
   void onInit() {
     super.onInit();
-    _loadSession();
+    tagController.addListener(_onTagChanged);
     _initRfid();
-  }
-
-  Future<void> _loadSession() async {
-    _orgId = await secureStorage.orgId ?? 0;
-    _userId = await secureStorage.userId ?? 0;
   }
 
   Future<void> _initRfid() async {
     _tagSubscription = rfidService.tagStream.listen(_onTagRead);
     isRfidConnected.value = await rfidService.connect();
+  }
+
+  void _onTagChanged() {
+    identityAsset.value = null;
   }
 
   void _onTagRead(String tag) {
@@ -64,26 +55,7 @@ class AssignAssetTagController extends GetxController {
     }
   }
 
-  bool get _hasTag => tagController.text.trim().isNotEmpty;
-
-  Future<void> openAssetSearch() async {
-    if (!_hasTag) {
-      Get.snackbar(
-        AppStrings.qrRfidRequired,
-        AppStrings.scanOrEnterQrRfidFirst,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      return;
-    }
-
-    final result = await Get.toNamed(AppRoutes.assetSearch);
-    if (result is AssetLinkTagModel) {
-      selectedAssetId.value = result.assetId;
-      assetController.text = result.displayLabel;
-    }
-  }
-
-  Future<void> assignTag() async {
+  Future<void> fetchDetails() async {
     final tag = tagController.text.trim();
     if (tag.isEmpty) {
       Get.snackbar(
@@ -93,84 +65,117 @@ class AssignAssetTagController extends GetxController {
       );
       return;
     }
-    if (selectedAssetId.value == null) {
-      Get.snackbar(
-        AppStrings.assetRequired,
-        AppStrings.selectAssetNameOrCode,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      return;
-    }
 
-    isSubmitting.value = true;
+    isFetching.value = true;
+    identityAsset.value = null;
     try {
-      final response = await assetRepository.insertAssetStockIn(
-        StockInRequestModel(
-          orgId: _orgId,
-          assetId: selectedAssetId.value!,
-          createdById: _userId,
-          isDeleted: false,
-          assetStockInDetails: [
-            StockInDetailModel(
-              serialNo: serialController.text.trim(),
-              tagCode: tag,
-            ),
-          ],
-        ),
+      final result = await assetRepository.identityAssetForMobileApp(
+        assetData: tag,
       );
 
-      if (response.succeeded) {
-        Get.snackbar(
-          AppStrings.success,
-          response.message.isNotEmpty
-              ? response.message
-              : AppStrings.tagAssignedSuccessfully,
-          snackPosition: SnackPosition.BOTTOM,
-        );
-        _resetForm();
+      if (result.succeeded && result.asset != null) {
+        identityAsset.value = result.asset;
       } else {
         Get.snackbar(
-          AppStrings.assignFailed,
-          response.message.isNotEmpty
-              ? response.message
-              : AppStrings.unableToAssignTag,
+          AppStrings.fetchFailed,
+          result.message.isNotEmpty
+              ? result.message
+              : AppStrings.unableToFetchAssetDetails,
           snackPosition: SnackPosition.BOTTOM,
         );
       }
     } on DioException catch (e) {
       final data = e.response?.data;
       Get.snackbar(
-        AppStrings.assignFailed,
+        AppStrings.fetchFailed,
         data is Map && data['message'] != null
             ? data['message'].toString()
-            : AppStrings.unableToAssignTagRetry,
+            : AppStrings.unableToFetchAssetDetailsRetry,
         snackPosition: SnackPosition.BOTTOM,
       );
     } catch (_) {
       Get.snackbar(
-        AppStrings.assignFailed,
-        AppStrings.unableToAssignTagRetry,
+        AppStrings.fetchFailed,
+        AppStrings.unableToFetchAssetDetailsRetry,
         snackPosition: SnackPosition.BOTTOM,
       );
     } finally {
-      isSubmitting.value = false;
+      isFetching.value = false;
+    }
+  }
+
+  Future<void> deassignTag() async {
+    final tag = tagController.text.trim();
+    if (tag.isEmpty) {
+      Get.snackbar(
+        AppStrings.qrRfidRequired,
+        AppStrings.scanOrEnterQrRfid,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+    if (identityAsset.value == null) {
+      Get.snackbar(
+        AppStrings.assetDetailsRequired,
+        AppStrings.fetchDetailsBeforeDeassign,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    isDeassigning.value = true;
+    try {
+      final response = await assetRepository.deassignAssetTag(tagCode: tag);
+
+      if (response.succeeded) {
+        Get.snackbar(
+          AppStrings.success,
+          response.message.isNotEmpty
+              ? response.message
+              : AppStrings.assetTagDeassignedSuccessfully,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        _resetForm();
+      } else {
+        Get.snackbar(
+          AppStrings.deAssignFailed,
+          response.message.isNotEmpty
+              ? response.message
+              : AppStrings.unableToDeassignAssetTag,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      Get.snackbar(
+        AppStrings.deAssignFailed,
+        data is Map && data['message'] != null
+            ? data['message'].toString()
+            : AppStrings.unableToDeassignAssetTagRetry,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } catch (_) {
+      Get.snackbar(
+        AppStrings.deAssignFailed,
+        AppStrings.unableToDeassignAssetTagRetry,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isDeassigning.value = false;
     }
   }
 
   void _resetForm() {
     tagController.clear();
-    assetController.clear();
-    serialController.clear();
-    selectedAssetId.value = null;
+    identityAsset.value = null;
   }
 
   @override
   void onClose() {
+    tagController.removeListener(_onTagChanged);
     _tagSubscription?.cancel();
     rfidService.disconnect();
     tagController.dispose();
-    assetController.dispose();
-    serialController.dispose();
     super.onClose();
   }
 }

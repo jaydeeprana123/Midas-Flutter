@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:midas/Home/Controllers/home_controller.dart';
 import 'package:midas/Shared/Widgets/midas_toolbar_logo.dart';
 import 'package:midas/app/constants/app_assets.dart';
+import 'package:midas/app/constants/app_strings.dart';
 import 'package:midas/app/theme/app_text_styles.dart';
 import 'package:midas/app/theme/app_theme.dart';
 
@@ -40,44 +41,51 @@ class HomeView extends GetView<HomeController> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          orgLabel.isEmpty ? 'GSSPL' : orgLabel,
+                          orgLabel.isEmpty
+                              ? AppStrings.defaultOrgLabel
+                              : orgLabel,
                           style: AppTextStyles.drawerHeader(),
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 10),
-                _DrawerItem(
-                  icon: Icons.home,
-                  label: 'Dashboard',
-                ),
-                ...controller.drawerMenuItems.map(
-                  (item) => _DrawerItem(
-                    icon: item.icon,
-                    label: item.title,
-                    onTap: item.route == null
-                        ? null
-                        : () {
-                            Navigator.of(context).pop();
-                            Get.toNamed(item.route!);
-                          },
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.only(top: 10),
+                    children: [
+                      _DrawerItem(
+                        icon: Icons.home,
+                        label: AppStrings.dashboard,
+                      ),
+                      ...controller.drawerMenuItems.map(
+                        (item) => _DrawerItem(
+                          icon: item.icon,
+                          label: item.title,
+                          onTap: item.route == null
+                              ? null
+                              : () {
+                                  Navigator.of(context).pop();
+                                  Get.toNamed(item.route!);
+                                },
+                        ),
+                      ),
+                      _DrawerItem(
+                        icon: Icons.logout,
+                        label: AppStrings.logout,
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          controller.onLogoutTap();
+                        },
+                      ),
+                    ],
                   ),
                 ),
-                _DrawerItem(
-                  icon: Icons.logout,
-                  label: 'Logout',
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    controller.onLogoutTap();
-                  },
-                ),
-                const Spacer(),
                 Center(
                   child: Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.only(bottom: 16, top: 8),
                     child: Text(
-                      'Version ${version.isEmpty ? 'N/A' : version}',
+                      AppStrings.version(version),
                       style: AppTextStyles.version(),
                     ),
                   ),
@@ -87,105 +95,114 @@ class HomeView extends GetView<HomeController> {
           ),
         ),
       ),
-      body: Obx(
-        () {
-          final currentItems = controller.selectedTab.value == 0
-              ? controller.assetMenuItems
-              : controller.equipmentMenuItems;
+      body: Obx(() {
+        final currentItems = controller.selectedTab.value == 0
+            ? controller.assetMenuItems
+            : controller.equipmentMenuItems;
 
-          return Column(
-            children: [
-              Container(
-                width: double.infinity,
-                color: AppTheme.primary,
-                padding: const EdgeInsets.fromLTRB(12, 6, 12, 16),
-                child: Column(
-                  children: [
-                    Text(
-                      controller.selectedTab.value == 0
-                          ? 'Asset Tracking and Management\nSystem'
-                          : 'Equipment Maintenance Management\nSystem',
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.screenTitle(),
+        return Column(
+          children: [
+            Container(
+              width: double.infinity,
+              color: AppTheme.primary,
+              padding: const EdgeInsets.fromLTRB(12, 6, 12, 16),
+              child: Column(
+                children: [
+                  Text(
+                    controller.selectedTab.value == 0
+                        ? AppStrings.assetTrackingSystem
+                        : AppStrings.equipmentMaintenanceSystem,
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.screenTitle(),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    const SizedBox(height: 16),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('User :', style: AppTextStyles.userLabel()),
-                          Flexible(
-                            child: Text(
-                              orgLabel.isEmpty ? 'GSSPL' : orgLabel,
-                              textAlign: TextAlign.right,
-                              style: AppTextStyles.userValue(),
-                            ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 14,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          AppStrings.userLabel,
+                          style: AppTextStyles.userLabel(),
+                        ),
+                        Flexible(
+                          child: Text(
+                            orgLabel.isEmpty
+                                ? AppStrings.defaultOrgLabel
+                                : orgLabel,
+                            textAlign: TextAlign.right,
+                            style: AppTextStyles.userValue(),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
+                  ),
+                ],
+              ),
+            ),
+            if (controller.showAssetsTab || controller.showEquipmentsTab)
+              Container(
+                color: Colors.white,
+                child: Row(
+                  children: [
+                    if (controller.showAssetsTab)
+                      _TabHeader(
+                        text: AppStrings.assetsTab,
+                        selected: controller.selectedTab.value == 0,
+                        onTap: () => controller.onTabChanged(0),
+                      ),
+                    if (controller.showEquipmentsTab)
+                      _TabHeader(
+                        text: AppStrings.equipmentsTab,
+                        selected: controller.selectedTab.value == 1,
+                        onTap: () => controller.onTabChanged(1),
+                      ),
                   ],
                 ),
               ),
-              if (controller.showAssetsTab || controller.showEquipmentsTab)
-                Container(
-                  color: Colors.white,
-                  child: Row(
-                    children: [
-                      if (controller.showAssetsTab)
-                        _TabHeader(
-                          text: 'ASSETS',
-                          selected: controller.selectedTab.value == 0,
-                          onTap: () => controller.onTabChanged(0),
-                        ),
-                      if (controller.showEquipmentsTab)
-                        _TabHeader(
-                          text: 'EQUIPMENTS',
-                          selected: controller.selectedTab.value == 1,
-                          onTap: () => controller.onTabChanged(1),
-                        ),
-                    ],
-                  ),
-                ),
-              Expanded(
-                child: currentItems.isEmpty
-                    ? Center(
-                        child: Text(
-                          'No modules available for your account.',
-                          style: AppTextStyles.body(color: Colors.black54),
-                          textAlign: TextAlign.center,
-                        ),
-                      )
-                    : Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        child: GridView.count(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 14,
-                          crossAxisSpacing: 14,
-                          childAspectRatio: 1.2, // width : height
-                          children: currentItems
-                              .map(
-                                (item) => _ActionCard(
-                                  icon: item.icon,
-                                  title: item.title,
-                                  onTap: item.route == null
-                                      ? null
-                                      : () => Get.toNamed(item.route!),
-                                ),
-                              )
-                              .toList(),
-                        ),
+            Expanded(
+              child: currentItems.isEmpty
+                  ? Center(
+                      child: Text(
+                        AppStrings.noModulesAvailable,
+                        style: AppTextStyles.body(color: Colors.black54),
+                        textAlign: TextAlign.center,
                       ),
-              ),
-            ],
-          );
-        },
-      ),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                      child: GridView.count(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 14,
+                        crossAxisSpacing: 14,
+                        childAspectRatio: 1.2, // width : height
+                        children: currentItems
+                            .map(
+                              (item) => _ActionCard(
+                                icon: item.icon,
+                                title: item.title,
+                                onTap: item.route == null
+                                    ? null
+                                    : () => Get.toNamed(item.route!),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ),
+            ),
+          ],
+        );
+      }),
     );
   }
 }
@@ -231,11 +248,7 @@ class _TabHeader extends StatelessWidget {
 }
 
 class _DrawerItem extends StatelessWidget {
-  const _DrawerItem({
-    required this.icon,
-    required this.label,
-    this.onTap,
-  });
+  const _DrawerItem({required this.icon, required this.label, this.onTap});
 
   final IconData icon;
   final String label;
@@ -264,9 +277,7 @@ class _ActionCard extends StatelessWidget {
       elevation: 10,
       color: Colors.white,
       shadowColor: Colors.black.withOpacity(0.1),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),

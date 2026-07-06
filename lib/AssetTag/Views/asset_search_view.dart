@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:midas/AssetTag/Controllers/asset_search_controller.dart';
+import 'package:midas/app/constants/app_strings.dart';
 import 'package:midas/app/theme/app_text_styles.dart';
 import 'package:midas/app/theme/app_theme.dart';
 
@@ -29,7 +30,7 @@ class AssetSearchView extends GetView<AssetSearchController> {
                       onChanged: controller.onQueryChanged,
                       style: AppTextStyles.body(color: Colors.black87),
                       decoration: InputDecoration(
-                        labelText: 'Asset name or Asset code',
+                        labelText: AppStrings.assetNameOrCode,
                         prefixIcon: const Icon(Icons.search),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
@@ -69,7 +70,7 @@ class _ResultsList extends GetView<AssetSearchController> {
       if (!controller.hasQuery.value) {
         return Center(
           child: Text(
-            'Type to search assets.',
+            AppStrings.typeToSearchAssets,
             style: AppTextStyles.body(color: Colors.black54),
           ),
         );
@@ -77,7 +78,7 @@ class _ResultsList extends GetView<AssetSearchController> {
       if (controller.results.isEmpty) {
         return Center(
           child: Text(
-            'No assets found.',
+            AppStrings.noAssetsFound,
             style: AppTextStyles.body(color: Colors.black54),
           ),
         );

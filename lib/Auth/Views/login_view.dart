@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:midas/Auth/Controllers/login_controller.dart';
 import 'package:midas/Auth/Views/domain_selection_dialog.dart';
 import 'package:midas/Shared/Widgets/midas_toolbar_logo.dart';
+import 'package:midas/app/constants/app_strings.dart';
 import 'package:midas/app/theme/app_text_styles.dart';
 import 'package:midas/app/theme/app_theme.dart';
 
@@ -23,7 +24,7 @@ class LoginView extends GetView<LoginController> {
                 children: [
                   const MidasToolbarLogo(height: 44),
                   const SizedBox(height: 10),
-                  Text('Login', style: AppTextStyles.loginTitle()),
+                  Text(AppStrings.login, style: AppTextStyles.loginTitle()),
                 ],
               ),
             ),
@@ -49,7 +50,7 @@ class LoginView extends GetView<LoginController> {
                         controller: controller.usernameController,
                         style: AppTextStyles.body(color: Colors.black87),
                         decoration: const InputDecoration(
-                          hintText: 'User Name',
+                          labelText: AppStrings.userName,
                           prefixIcon: Icon(Icons.person),
                         ),
                       ),
@@ -60,7 +61,7 @@ class LoginView extends GetView<LoginController> {
                           obscureText: controller.obscurePassword.value,
                           style: AppTextStyles.body(color: Colors.black87),
                           decoration: InputDecoration(
-                            hintText: 'Password',
+                            labelText: AppStrings.password,
                             prefixIcon: const Icon(Icons.lock),
                             suffixIcon: IconButton(
                               icon: Icon(
@@ -84,7 +85,7 @@ class LoginView extends GetView<LoginController> {
                               ? const CircularProgressIndicator(
                                   color: Colors.white,
                                 )
-                              : const Text('Login'),
+                              : const Text(AppStrings.login),
                         ),
                       ),
                     ],
@@ -101,10 +102,10 @@ class LoginView extends GetView<LoginController> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Version ${controller.version.value.isEmpty ? 'N/A' : controller.version.value}',
+                        AppStrings.version(controller.version.value),
                         style: AppTextStyles.footer(),
                       ),
-                      Text('Powered By G', style: AppTextStyles.footerBrand()),
+                      Text(AppStrings.poweredByG, style: AppTextStyles.footerBrand()),
                     ],
                   ),
                 ),

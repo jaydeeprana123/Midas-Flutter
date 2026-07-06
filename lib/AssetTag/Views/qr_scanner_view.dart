@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:midas/app/constants/app_strings.dart';
 import 'package:midas/app/theme/app_text_styles.dart';
 import 'package:midas/app/theme/app_theme.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -41,7 +42,7 @@ class _QrScannerViewState extends State<QrScannerView> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('Scan QR / Barcode'),
+        title: const Text(AppStrings.scanQrBarcode),
         actions: [
           IconButton(
             onPressed: () => _controller.toggleTorch(),
@@ -64,7 +65,7 @@ class _QrScannerViewState extends State<QrScannerView> {
                 child: Padding(
                   padding: const EdgeInsets.all(24),
                   child: Text(
-                    'Unable to start camera.\n${error.errorCode.name}',
+                    AppStrings.cameraError(error.errorCode.name),
                     textAlign: TextAlign.center,
                     style: AppTextStyles.body(color: Colors.white),
                   ),
@@ -85,7 +86,7 @@ class _QrScannerViewState extends State<QrScannerView> {
             left: 24,
             right: 24,
             child: Text(
-              'Align the QR / barcode within the frame',
+              AppStrings.alignQrWithinFrame,
               textAlign: TextAlign.center,
               style: AppTextStyles.body(color: Colors.white),
             ),

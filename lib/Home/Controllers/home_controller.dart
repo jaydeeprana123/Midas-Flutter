@@ -6,6 +6,7 @@ import 'package:midas/Shared/Services/api_client.dart';
 import 'package:midas/Shared/Services/secure_storage_service.dart';
 import 'package:midas/Shared/Widgets/logout_confirmation_dialog.dart';
 import 'package:midas/app/constants/app_menu_config.dart';
+import 'package:midas/app/constants/app_strings.dart';
 import 'package:midas/app/routes/app_routes.dart';
 
 class HomeController extends GetxController {
@@ -85,29 +86,29 @@ class HomeController extends GetxController {
         return;
       }
       Get.snackbar(
-        'Logout Failed',
-        (response['message'] ?? 'Unable to logout.').toString(),
+        AppStrings.logoutFailed,
+        (response['message'] ?? AppStrings.unableToLogout).toString(),
         snackPosition: SnackPosition.BOTTOM,
       );
     } on DioException catch (e) {
       final responseData = e.response?.data;
       if (responseData is Map && responseData['message'] != null) {
         Get.snackbar(
-          'Logout Failed',
+          AppStrings.logoutFailed,
           responseData['message'].toString(),
           snackPosition: SnackPosition.BOTTOM,
         );
       } else {
         Get.snackbar(
-          'Logout Failed',
-          'Unable to logout. Please try again.',
+          AppStrings.logoutFailed,
+          AppStrings.unableToLogoutRetry,
           snackPosition: SnackPosition.BOTTOM,
         );
       }
     } catch (_) {
       Get.snackbar(
-        'Logout Failed',
-        'Unable to logout. Please try again.',
+        AppStrings.logoutFailed,
+        AppStrings.unableToLogoutRetry,
         snackPosition: SnackPosition.BOTTOM,
       );
     } finally {

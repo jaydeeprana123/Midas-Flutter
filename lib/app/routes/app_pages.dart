@@ -1,9 +1,14 @@
 import 'package:get/get.dart';
 import 'package:midas/AssetTag/Controllers/asset_search_controller.dart';
 import 'package:midas/AssetTag/Controllers/assign_asset_tag_controller.dart';
+import 'package:midas/AssetTag/Controllers/deassign_asset_tag_controller.dart';
 import 'package:midas/AssetTag/Views/asset_search_view.dart';
 import 'package:midas/AssetTag/Views/assign_asset_tag_view.dart';
+import 'package:midas/AssetTag/Views/deassign_asset_tag_view.dart';
 import 'package:midas/AssetTag/asset_repository.dart';
+import 'package:midas/Location/Controllers/assign_location_tag_controller.dart';
+import 'package:midas/Location/Views/assign_location_tag_view.dart';
+import 'package:midas/Location/location_repository.dart';
 import 'package:midas/Auth/Controllers/login_controller.dart';
 import 'package:midas/Auth/Controllers/splash_controller.dart';
 import 'package:midas/Auth/Views/login_view.dart';
@@ -71,6 +76,30 @@ class AppPages {
           () => AssignAssetTagController(
             assetRepository: Get.find<AssetRepository>(),
             secureStorage: Get.find<SecureStorageService>(),
+            rfidService: Get.find<RfidService>(),
+          ),
+        );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.deAssignAssetTag,
+      page: () => const DeassignAssetTagView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => DeassignAssetTagController(
+            assetRepository: Get.find<AssetRepository>(),
+            rfidService: Get.find<RfidService>(),
+          ),
+        );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.assignLocationTag,
+      page: () => const AssignLocationTagView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => AssignLocationTagController(
+            locationRepository: Get.find<LocationRepository>(),
             rfidService: Get.find<RfidService>(),
           ),
         );

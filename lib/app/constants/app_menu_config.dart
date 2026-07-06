@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:midas/app/constants/app_strings.dart';
 import 'package:midas/app/routes/app_routes.dart';
 
 enum AppMenuSection { assets, equipments }
@@ -31,7 +32,7 @@ class AppMenuConfig {
 
   static const dashboard = AppMenuItem(
     permissionLabel: '__dashboard__',
-    title: 'Dashboard',
+    title: AppStrings.dashboard,
     icon: Icons.home,
     section: AppMenuSection.assets,
     showOnHome: false,
@@ -40,68 +41,70 @@ class AppMenuConfig {
   static const items = <AppMenuItem>[
     AppMenuItem(
       permissionLabel: 'Assign QR Asset',
-      title: 'Assign Asset Tag',
+      title: AppStrings.assignAssetTag,
       icon: Icons.qr_code_scanner,
       section: AppMenuSection.assets,
       route: AppRoutes.assignAssetTag,
     ),
     AppMenuItem(
       permissionLabel: 'DeAssign QR Asset',
-      title: 'DeAssign Asset Tag',
+      title: AppStrings.deAssignAssetTag,
       icon: Icons.qr_code_2,
       section: AppMenuSection.assets,
+      route: AppRoutes.deAssignAssetTag,
     ),
     AppMenuItem(
       permissionLabel: 'Assign Location',
-      title: 'Assign Location Tag',
+      title: AppStrings.assignLocationTag,
       icon: Icons.map,
       section: AppMenuSection.assets,
+      route: AppRoutes.assignLocationTag,
     ),
     AppMenuItem(
       permissionLabel: 'Change Location By Location',
-      title: 'Change Location By Location',
+      title: AppStrings.changeLocationByLocation,
       icon: Icons.sync,
       section: AppMenuSection.assets,
     ),
     AppMenuItem(
       permissionLabel: 'Change Location By Asset',
-      title: 'Change Location By Asset',
+      title: AppStrings.changeLocationByAsset,
       icon: Icons.sync_problem,
       section: AppMenuSection.assets,
     ),
     AppMenuItem(
       permissionLabel: 'Identify Asset',
-      title: 'Identify Asset',
+      title: AppStrings.identifyAsset,
       icon: Icons.search,
       section: AppMenuSection.assets,
     ),
     AppMenuItem(
       permissionLabel: 'Search Asset',
-      title: 'Search Asset',
+      title: AppStrings.searchAsset,
       icon: Icons.add_location,
       section: AppMenuSection.assets,
     ),
     AppMenuItem(
       permissionLabel: 'Audit Assets',
-      title: 'Audit Assets',
+      title: AppStrings.auditAssets,
       icon: Icons.library_books,
       section: AppMenuSection.assets,
     ),
     AppMenuItem(
       permissionLabel: 'Link Equipment Tag',
-      title: 'Link Equipment Tag',
+      title: AppStrings.linkEquipmentTag,
       icon: Icons.link,
       section: AppMenuSection.equipments,
     ),
     AppMenuItem(
       permissionLabel: 'Delink Equipment Tag',
-      title: 'Delink Equipment Tag',
+      title: AppStrings.delinkEquipmentTag,
       icon: Icons.link_off,
       section: AppMenuSection.equipments,
     ),
     AppMenuItem(
       permissionLabel: 'Identify Equipment',
-      title: 'Identify Equipment',
+      title: AppStrings.identifyEquipment,
       icon: Icons.badge,
       section: AppMenuSection.equipments,
     ),

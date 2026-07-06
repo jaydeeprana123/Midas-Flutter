@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:midas/AssetTag/Controllers/assign_asset_tag_controller.dart';
+import 'package:midas/AssetTag/Controllers/deassign_asset_tag_controller.dart';
 import 'package:midas/Shared/Widgets/midas_toolbar_logo.dart';
 import 'package:midas/app/constants/app_strings.dart';
 import 'package:midas/app/theme/app_text_styles.dart';
 import 'package:midas/app/theme/app_theme.dart';
 
-class AssignAssetTagView extends GetView<AssignAssetTagController> {
-  const AssignAssetTagView({super.key});
+class DeassignAssetTagView extends GetView<DeassignAssetTagController> {
+  const DeassignAssetTagView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,34 +36,16 @@ class AssignAssetTagView extends GetView<AssignAssetTagController> {
                   child: Column(
                     children: [
                       _TagField(),
-                      const SizedBox(height: 16),
-                      TextField(
-                        maxLines: 2,
-                        minLines: 1,
-                        controller: controller.assetController,
-                        readOnly: true,
-                        onTap: controller.openAssetSearch,
-                        style: AppTextStyles.body(color: Colors.black87),
-                        decoration: const InputDecoration(
-                          labelText: AppStrings.assetNameOrCode,
-                          prefixIcon: Icon(Icons.search),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      TextField(
-                        controller: controller.serialController,
-                        style: AppTextStyles.body(color: Colors.black87),
-                        decoration: const InputDecoration(
-                          labelText: AppStrings.assetSerialNumber,
-                        ),
-                      ),
                       const SizedBox(height: 22),
-                      Obx(
-                        () => ElevatedButton(
-                          onPressed: controller.isSubmitting.value
+                      Obx(() {
+                        if (controller.identityAsset.value != null) {
+                          return const SizedBox.shrink();
+                        }
+                        return ElevatedButton(
+                          onPressed: controller.isFetching.value
                               ? null
-                              : controller.assignTag,
-                          child: controller.isSubmitting.value
+                              : controller.fetchDetails,
+                          child: controller.isFetching.value
                               ? const SizedBox(
                                   height: 22,
                                   width: 22,
@@ -72,9 +54,49 @@ class AssignAssetTagView extends GetView<AssignAssetTagController> {
                                     strokeWidth: 2.5,
                                   ),
                                 )
-                              : const Text(AppStrings.assignTag),
-                        ),
-                      ),
+                              : const Text(AppStrings.fetchDetails),
+                        );
+                      }),
+                      Obx(() {
+                        final asset = controller.identityAsset.value;
+                        if (asset == null) return const SizedBox.shrink();
+
+                        return Column(
+                          children: [
+                            const SizedBox(height: 12),
+                            _DetailField(
+                              label: AppStrings.assetName,
+                              value: asset.assetName,
+                            ),
+                            const SizedBox(height: 16),
+                            _DetailField(
+                              label: AppStrings.assetCode,
+                              value: asset.assetCode,
+                            ),
+                            const SizedBox(height: 16),
+                            _DetailField(
+                              label: AppStrings.serialNo,
+                              value: asset.serialNo,
+                            ),
+                            const SizedBox(height: 22),
+                            ElevatedButton(
+                              onPressed: controller.isDeassigning.value
+                                  ? null
+                                  : controller.deassignTag,
+                              child: controller.isDeassigning.value
+                                  ? const SizedBox(
+                                      height: 22,
+                                      width: 22,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2.5,
+                                      ),
+                                    )
+                                  : const Text(AppStrings.deAssignAssetTag),
+                            ),
+                          ],
+                        );
+                      }),
                     ],
                   ),
                 ),
@@ -115,14 +137,14 @@ class _Header extends StatelessWidget {
             style: AppTextStyles.screenTitle(),
           ),
           const SizedBox(height: 12),
-          Text(AppStrings.assignAssetTag, style: AppTextStyles.loginTitle()),
+          Text(AppStrings.deAssignAssetTag, style: AppTextStyles.loginTitle()),
         ],
       ),
     );
   }
 }
 
-class _TagField extends GetView<AssignAssetTagController> {
+class _TagField extends GetView<DeassignAssetTagController> {
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -155,6 +177,29 @@ class _TagField extends GetView<AssignAssetTagController> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _DetailField extends StatelessWidget {
+  const _DetailField({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return InputDecorator(
+      isEmpty: value.isEmpty,
+      decoration: InputDecoration(
+        labelText: label,
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
+        labelStyle: AppTextStyles.body(color: Colors.black54),
+      ),
+      child: Text(
+        value.isNotEmpty ? value : AppStrings.emptyValue,
+        style: AppTextStyles.body(color: Colors.black87),
+      ),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:midas/AssetTag/Models/asset_link_tag_model.dart';
+import 'package:midas/AssetTag/Models/identity_asset_model.dart';
 import 'package:midas/AssetTag/Models/stock_in_request_model.dart';
 import 'package:midas/AssetTag/Models/stock_in_response_model.dart';
 import 'package:midas/Shared/Services/api_client.dart';
@@ -32,6 +33,29 @@ class AssetRepository {
     final json = await _apiClient.post(
       '/api/AssetStockIn/InsertAssetStockInForMobApp',
       body: request.toJson(),
+    );
+    return StockInResponseModel.fromJson(json);
+  }
+
+  /// Identifies an asset by QR / RFID tag for the mobile app.
+  /// `GET /api/Asset/IdentityAssetForMobileApp?assetdata=`
+  Future<IdentityAssetResult> identityAssetForMobileApp({
+    required String assetData,
+  }) async {
+    final json = await _apiClient.getWithQuery(
+      '/api/Asset/IdentityAssetForMobileApp',
+      queryParameters: {'assetdata': assetData},
+    );
+    return IdentityAssetResult.fromJson(json);
+  }
+
+  /// De-assigns a tag from an asset.
+  /// `POST /api/AssetStockIn/UpdateAssetStockInDetailsDelinkModel/{TagCode}`
+  Future<StockInResponseModel> deassignAssetTag({
+    required String tagCode,
+  }) async {
+    final json = await _apiClient.post(
+      '/api/AssetStockIn/UpdateAssetStockInDetailsDelinkModel/${Uri.encodeComponent(tagCode)}',
     );
     return StockInResponseModel.fromJson(json);
   }

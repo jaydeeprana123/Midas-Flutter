@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:midas/app/bindings/initial_binding.dart';
 import 'package:midas/app/routes/app_pages.dart';
 import 'package:midas/app/routes/app_routes.dart';
+import 'package:midas/app/constants/app_strings.dart';
 import 'package:midas/app/theme/app_theme.dart';
 
 class App extends StatelessWidget {
@@ -11,7 +12,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'Midas',
+      title: AppStrings.appTitle,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme(),
       initialBinding: InitialBinding(),

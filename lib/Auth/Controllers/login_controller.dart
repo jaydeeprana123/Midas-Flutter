@@ -9,6 +9,7 @@ import 'package:midas/Shared/Services/api_client.dart';
 import 'package:midas/Shared/Services/device_service.dart';
 import 'package:midas/Shared/Services/local_storage_service.dart';
 import 'package:midas/Shared/Services/secure_storage_service.dart';
+import 'package:midas/app/constants/app_strings.dart';
 import 'package:midas/app/routes/app_routes.dart';
 
 class LoginController extends GetxController {
@@ -85,10 +86,10 @@ class LoginController extends GetxController {
       final data = loginResponse.data;
       if (data == null || data.token.isEmpty) {
         Get.snackbar(
-          'Login Failed',
+          AppStrings.loginFailed,
           loginResponse.message.isNotEmpty
               ? loginResponse.message
-              : 'Authentication token not received.',
+              : AppStrings.authTokenNotReceived,
           snackPosition: SnackPosition.BOTTOM,
         );
         return;
@@ -116,21 +117,21 @@ class LoginController extends GetxController {
       final responseData = e.response?.data;
       if (responseData is Map && responseData['message'] != null) {
         Get.snackbar(
-          'Login Failed',
+          AppStrings.loginFailed,
           responseData['message'].toString(),
           snackPosition: SnackPosition.BOTTOM,
         );
       } else {
         Get.snackbar(
-          'Login Failed',
-          'Invalid username or password.',
+          AppStrings.loginFailed,
+          AppStrings.invalidUsernameOrPassword,
           snackPosition: SnackPosition.BOTTOM,
         );
       }
     } catch (_) {
       Get.snackbar(
-        'Login Failed',
-        'Unable to login. Please try again.',
+        AppStrings.loginFailed,
+        AppStrings.unableToLogin,
         snackPosition: SnackPosition.BOTTOM,
       );
     } finally {

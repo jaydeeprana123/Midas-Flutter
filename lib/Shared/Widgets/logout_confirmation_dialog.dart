@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:midas/app/constants/app_strings.dart';
 import 'package:midas/app/theme/app_text_styles.dart';
 import 'package:midas/app/theme/app_theme.dart';
 
@@ -13,10 +14,10 @@ Future<bool?> showLogoutConfirmationDialog() {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Logout', style: AppTextStyles.loginTitle(color: AppTheme.primary)),
+            Text(AppStrings.logout, style: AppTextStyles.loginTitle(color: AppTheme.primary)),
             const SizedBox(height: 12),
             Text(
-              'Are you sure you want to logout?',
+              AppStrings.logoutConfirmation,
               textAlign: TextAlign.center,
               style: AppTextStyles.body(color: Colors.black87),
             ),
@@ -34,14 +35,14 @@ Future<bool?> showLogoutConfirmationDialog() {
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    child: Text('Cancel', style: AppTextStyles.button(color: AppTheme.primary)),
+                    child: Text(AppStrings.cancel, style: AppTextStyles.button(color: AppTheme.primary)),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () => Get.back(result: true),
-                    child: const Text('Logout'),
+                    child: const Text(AppStrings.logout),
                   ),
                 ),
               ],
