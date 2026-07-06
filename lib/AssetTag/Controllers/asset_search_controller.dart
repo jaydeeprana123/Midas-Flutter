@@ -69,9 +69,6 @@ class AssetSearchController extends GetxController {
   }
 
   void selectAsset(AssetLinkTagModel asset) {
-    
-    // print("selectAsset " + )
-    
     Get.back(result: asset);
   }
 

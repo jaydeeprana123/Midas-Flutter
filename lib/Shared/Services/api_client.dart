@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:midas/Shared/Services/app_logger.dart';
 
 typedef UnauthorizedCallback = Future<void> Function();
 
@@ -6,7 +7,34 @@ class ApiClient {
   ApiClient({required String baseUrl}) : _dio = _createDio(baseUrl) {
     _dio.interceptors.add(
       InterceptorsWrapper(
+        onRequest: (options, handler) {
+          AppLogger.apiRequest(
+            method: options.method,
+            url: options.uri.toString(),
+            queryParameters: options.queryParameters.isEmpty
+                ? null
+                : Map<String, dynamic>.from(options.queryParameters),
+            body: options.data,
+          );
+          handler.next(options);
+        },
+        onResponse: (response, handler) {
+          AppLogger.apiResponse(
+            method: response.requestOptions.method,
+            url: response.requestOptions.uri.toString(),
+            statusCode: response.statusCode,
+            response: response.data,
+          );
+          handler.next(response);
+        },
         onError: (error, handler) async {
+          AppLogger.apiResponse(
+            method: error.requestOptions.method,
+            url: error.requestOptions.uri.toString(),
+            statusCode: error.response?.statusCode,
+            response: error.response?.data,
+            errorMessage: error.message,
+          );
           await _handleUnauthorized(error);
           handler.next(error);
         },
