@@ -14,6 +14,7 @@ class AppStrings {
   static const save = 'Save';
   static const submit = 'Submit';
   static const success = 'Success';
+  static const ok = 'OK';
 
   // Common labels
   static const userLabel = 'User :';
@@ -152,6 +153,20 @@ class AppStrings {
   static const unableToFetchLocationDetailsRetry =
       'Unable to fetch location details. Please try again.';
   static const noAssetsAtLocation = 'No assets found at this location.';
+
+  // Change location by asset
+  static const scanAssetQrOrPressButton = 'Scan Asset QR or Press Button for RFID';
+  static const currentLocation = 'Current Location';
+  static const update = 'Update';
+  static const addAssetTagRequired = 'Asset Tag Required';
+  static const addAtLeastOneAssetTag = 'Please add at least one asset tag.';
+  static const identifyAssetsFailed = 'Identify Assets Failed';
+  static const unableToIdentifyAssets = 'Unable to identify assets.';
+  static const duplicateAssetTag = 'Duplicate Asset Tag';
+  static const assetTagAlreadyAdded = 'This asset tag is already in the list.';
+  static const identifiedAssetsRequired = 'Identified Assets Required';
+  static const identifyAssetsBeforeUpdate =
+      'Please identify assets before updating location.';
 
   // Shared validation / snackbars
   static const qrRfidRequired = 'QR / RFID Required';

@@ -113,6 +113,15 @@ class ApiClient {
     return _toMap(response.data);
   }
 
+  /// Posts a raw JSON body (e.g. a JSON array).
+  Future<Map<String, dynamic>> postRaw(
+    String path, {
+    required dynamic data,
+  }) async {
+    final response = await _dio.post(path, data: data);
+    return _toMap(response.data);
+  }
+
   static Map<String, dynamic> _toMap(dynamic data) {
     if (data is Map<String, dynamic>) return data;
     if (data is Map) return Map<String, dynamic>.from(data);

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:midas/Location/Controllers/change_location_by_location_controller.dart';
 import 'package:midas/Location/Models/change_location_remark_model.dart';
+import 'package:midas/Location/location_change_type.dart';
 import 'package:midas/Location/Views/destination_location_dialog.dart';
 import 'package:midas/Shared/Widgets/midas_toolbar_logo.dart';
 import 'package:midas/app/constants/app_strings.dart';

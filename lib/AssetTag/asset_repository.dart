@@ -1,4 +1,5 @@
 import 'package:midas/AssetTag/Models/asset_link_tag_model.dart';
+import 'package:midas/AssetTag/Models/bulk_identity_result.dart';
 import 'package:midas/AssetTag/Models/identity_asset_model.dart';
 import 'package:midas/AssetTag/Models/stock_in_request_model.dart';
 import 'package:midas/AssetTag/Models/stock_in_response_model.dart';
@@ -58,5 +59,17 @@ class AssetRepository {
       '/api/AssetStockIn/UpdateAssetStockInDetailsDelinkModel/${Uri.encodeComponent(tagCode)}',
     );
     return StockInResponseModel.fromJson(json);
+  }
+
+  /// Identifies multiple assets by tag codes for the mobile app.
+  /// `POST /api/Asset/BulkIdentityAssetsForMobileApp`
+  Future<BulkIdentityResult> bulkIdentityAssetsForMobileApp(
+    List<String> tagCodes,
+  ) async {
+    final json = await _apiClient.postRaw(
+      '/api/Asset/BulkIdentityAssetsForMobileApp',
+      data: tagCodes,
+    );
+    return BulkIdentityResult.fromJson(json);
   }
 }

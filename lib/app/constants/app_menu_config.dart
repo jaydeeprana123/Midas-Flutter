@@ -72,6 +72,7 @@ class AppMenuConfig {
       title: AppStrings.changeLocationByAsset,
       icon: Icons.sync_problem,
       section: AppMenuSection.assets,
+      route: AppRoutes.changeLocationByAsset,
     ),
     AppMenuItem(
       permissionLabel: 'Identify Asset',

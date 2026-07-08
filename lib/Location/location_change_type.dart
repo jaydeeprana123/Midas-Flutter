@@ -1,0 +1,1 @@
+enum LocationChangeType { shift, transit }

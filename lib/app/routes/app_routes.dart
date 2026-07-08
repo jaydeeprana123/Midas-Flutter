@@ -7,4 +7,6 @@ abstract class AppRoutes {
   static const assetSearch = '/asset-search';
   static const assignLocationTag = '/assign-location-tag';
   static const changeLocationByLocation = '/change-location-by-location';
+  static const changeLocationByAsset = '/change-location-by-asset';
+  static const scanAssetForChangeLocation = '/scan-asset-for-change-location';
 }

@@ -9,9 +9,8 @@ import 'package:midas/Location/Models/location_asset_model.dart';
 import 'package:midas/Location/Models/update_asset_location_model.dart';
 import 'package:midas/Location/location_repository.dart';
 import 'package:midas/Shared/Services/rfid_service.dart';
+import 'package:midas/Location/location_change_type.dart';
 import 'package:midas/app/constants/app_strings.dart';
-
-enum LocationChangeType { shift, transit }
 
 class ChangeLocationByLocationController extends GetxController {
   ChangeLocationByLocationController({
