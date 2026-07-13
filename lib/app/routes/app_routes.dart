@@ -9,4 +9,5 @@ abstract class AppRoutes {
   static const changeLocationByLocation = '/change-location-by-location';
   static const changeLocationByAsset = '/change-location-by-asset';
   static const scanAssetForChangeLocation = '/scan-asset-for-change-location';
+  static const identifyAsset = '/identify-asset';
 }

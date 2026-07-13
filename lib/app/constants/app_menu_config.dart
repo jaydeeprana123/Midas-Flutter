@@ -79,6 +79,7 @@ class AppMenuConfig {
       title: AppStrings.identifyAsset,
       icon: Icons.search,
       section: AppMenuSection.assets,
+      route: AppRoutes.identifyAsset,
     ),
     AppMenuItem(
       permissionLabel: 'Search Asset',

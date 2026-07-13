@@ -21,6 +21,9 @@ class AppStrings {
   static const assetName = 'Asset Name';
   static const assetCode = 'Asset Code';
   static const serialNo = 'Serial No.';
+  static const tagCode = 'Tag code';
+  static const locationCode = 'Location Code';
+  static const location = 'Location';
   static const scanAssetQr = 'Scan Asset QR';
   static const scanQrOrPressButton = 'Scan QR or Press Button for RFID';
   static const scanLocationQrHere = 'Scan Location QR Here';

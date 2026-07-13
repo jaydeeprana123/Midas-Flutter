@@ -2,9 +2,11 @@ import 'package:get/get.dart';
 import 'package:midas/AssetTag/Controllers/asset_search_controller.dart';
 import 'package:midas/AssetTag/Controllers/assign_asset_tag_controller.dart';
 import 'package:midas/AssetTag/Controllers/deassign_asset_tag_controller.dart';
+import 'package:midas/AssetTag/Controllers/identify_asset_controller.dart';
 import 'package:midas/AssetTag/Views/asset_search_view.dart';
 import 'package:midas/AssetTag/Views/assign_asset_tag_view.dart';
 import 'package:midas/AssetTag/Views/deassign_asset_tag_view.dart';
+import 'package:midas/AssetTag/Views/identify_asset_view.dart';
 import 'package:midas/AssetTag/asset_repository.dart';
 import 'package:midas/Location/Controllers/assign_location_tag_controller.dart';
 import 'package:midas/Location/Controllers/change_location_by_asset_controller.dart';
@@ -138,6 +140,18 @@ class AppPages {
     GetPage(
       name: AppRoutes.scanAssetForChangeLocation,
       page: () => const ScanAssetQrChangeLocationView(),
+    ),
+    GetPage(
+      name: AppRoutes.identifyAsset,
+      page: () => const IdentifyAssetView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => IdentifyAssetController(
+            assetRepository: Get.find<AssetRepository>(),
+            rfidService: Get.find<RfidService>(),
+          ),
+        );
+      }),
     ),
     GetPage(
       name: AppRoutes.assetSearch,
