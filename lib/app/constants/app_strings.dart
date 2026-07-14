@@ -171,6 +171,44 @@ class AppStrings {
   static const identifyAssetsBeforeUpdate =
       'Please identify assets before updating location.';
 
+  // Search asset
+  static const assetNameCodeOrTagCode = 'Asset name/code or Tag code';
+  static const stopTrackingBeforeChangingAsset =
+      'Please stop tracking before selecting another asset.';
+  static const unableToStartAssetTracking = 'Unable to start asset tracking.';
+  static const unableToStartAssetTrackingRetry =
+      'Unable to start asset tracking. Please try again.';
+  static const trackingDataSavedSuccessfully =
+      'Tracking data saved successfully.';
+  static const unableToSaveTrackingData = 'Unable to save tracking data.';
+  static const unableToSaveTrackingDataRetry =
+      'Unable to save tracking data. Please try again.';
+  static const noTrackingDataScanned =
+      'Scanning has been stopped. No data was scanned.';
+
+  // Audit assets
+  static const selectAuditName = 'Select Audit Name';
+  static const totalAssets = 'Total Assets';
+  static const assetsFound = 'Assets Found';
+  static const missingAssets = 'Missing Assets';
+  static const alienAssets = 'Alien Assets';
+  static const invalidTagCount = 'Invalid Tag Count';
+  static const validUnassignedTagCount = 'Valid Unassigned Tag Count';
+  static const start = 'Start';
+  static const stop = 'Stop';
+  static const noAuditsFound = 'No audits found.';
+  static const scanFailed = 'Scan Failed';
+  static const rfidReaderUnavailable =
+      'RFID reader is not available. Please connect the device.';
+  static const unableToFetchAuditsRetry =
+      'Unable to fetch audits. Please try again.';
+  static const unableToFetchAuditSummaryRetry =
+      'Unable to fetch audit summary. Please try again.';
+  static const auditDataSavedSuccessfully = 'Audit data saved successfully.';
+  static const unableToSaveAuditData = 'Unable to save audit data.';
+  static const unableToSaveAuditDataRetry =
+      'Unable to save audit data. Please try again.';
+
   // Shared validation / snackbars
   static const qrRfidRequired = 'QR / RFID Required';
   static const scanOrEnterQrRfid = 'Please scan or enter a QR / RFID value.';

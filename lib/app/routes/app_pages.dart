@@ -1,4 +1,12 @@
 import 'package:get/get.dart';
+import 'package:midas/Audit/Controllers/audit_assets_controller.dart';
+import 'package:midas/SearchAsset/Controllers/search_asset_controller.dart';
+import 'package:midas/SearchAsset/Controllers/search_asset_lookup_controller.dart';
+import 'package:midas/SearchAsset/Views/search_asset_lookup_view.dart';
+import 'package:midas/SearchAsset/Views/search_asset_view.dart';
+import 'package:midas/SearchAsset/search_asset_repository.dart';
+import 'package:midas/Audit/Views/audit_assets_view.dart';
+import 'package:midas/Audit/audit_repository.dart';
 import 'package:midas/AssetTag/Controllers/asset_search_controller.dart';
 import 'package:midas/AssetTag/Controllers/assign_asset_tag_controller.dart';
 import 'package:midas/AssetTag/Controllers/deassign_asset_tag_controller.dart';
@@ -27,6 +35,7 @@ import 'package:midas/Home/Views/home_view.dart';
 import 'package:midas/Shared/Services/api_client.dart';
 import 'package:midas/Shared/Services/device_service.dart';
 import 'package:midas/Shared/Services/local_storage_service.dart';
+import 'package:midas/Shared/Services/location_service.dart';
 import 'package:midas/Shared/Services/rfid_service.dart';
 import 'package:midas/Shared/Services/secure_storage_service.dart';
 import 'package:midas/app/routes/app_routes.dart';
@@ -149,6 +158,43 @@ class AppPages {
           () => IdentifyAssetController(
             assetRepository: Get.find<AssetRepository>(),
             rfidService: Get.find<RfidService>(),
+          ),
+        );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.auditAssets,
+      page: () => const AuditAssetsView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => AuditAssetsController(
+            auditRepository: Get.find<AuditRepository>(),
+            secureStorage: Get.find<SecureStorageService>(),
+            rfidService: Get.find<RfidService>(),
+          ),
+        );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.searchAsset,
+      page: () => const SearchAssetView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => SearchAssetController(
+            searchAssetRepository: Get.find<SearchAssetRepository>(),
+            rfidService: Get.find<RfidService>(),
+            locationService: Get.find<LocationService>(),
+          ),
+        );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.searchAssetLookup,
+      page: () => const SearchAssetLookupView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => SearchAssetLookupController(
+            searchAssetRepository: Get.find<SearchAssetRepository>(),
           ),
         );
       }),

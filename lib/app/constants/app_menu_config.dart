@@ -86,12 +86,14 @@ class AppMenuConfig {
       title: AppStrings.searchAsset,
       icon: Icons.add_location,
       section: AppMenuSection.assets,
+      route: AppRoutes.searchAsset,
     ),
     AppMenuItem(
       permissionLabel: 'Audit Assets',
       title: AppStrings.auditAssets,
       icon: Icons.library_books,
       section: AppMenuSection.assets,
+      route: AppRoutes.auditAssets,
     ),
     AppMenuItem(
       permissionLabel: 'Link Equipment Tag',

@@ -5,11 +5,6 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-repositories {
-    // Resolves the local Zebra RFID SDK aar in app/libs.
-    flatDir { dirs("libs") }
-}
-
 android {
     namespace = "com.garima.midas"
     compileSdk = flutter.compileSdkVersion
@@ -49,6 +44,16 @@ flutter {
 }
 
 dependencies {
-    // Zebra RFID SDK (com.zebra.rfid.api3) bundled as a local aar.
-    implementation(":API3_LIB-release-2.0.2.114@aar")
+    // Chainway UHF RFID SDK (com.rscja.deviceapi) — the reader on the target
+    // device is a Chainway handheld, matching the reference MIDAS Android app
+    // (AssignQRActivity uses com.rscja.deviceapi.RFIDWithUHFUART).
+    //
+    // Preferred: a local copy at app/libs/DeviceAPI_ver20231208_release.aar.
+    // Fallback: reference the same aar in-place from the reference MIDAS project
+    // so the build works without a manual copy. Whichever exists is used.
+    val localAar = file("libs/DeviceAPI_ver20231208_release.aar")
+    val referenceAar =
+        file("D:/StudioFlutterAllProject/Midas/app/libs/DeviceAPI_ver20231208_release.aar")
+    val chainwayAar = if (localAar.exists()) localAar else referenceAar
+    implementation(files(chainwayAar))
 }

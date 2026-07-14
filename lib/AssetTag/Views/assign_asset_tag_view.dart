@@ -130,6 +130,9 @@ class _TagField extends GetView<AssignAssetTagController> {
         Expanded(
           child: TextField(
             controller: controller.tagController,
+            focusNode: controller.tagFocusNode,
+            autofocus: true,
+            textInputAction: TextInputAction.done,
             style: AppTextStyles.body(color: Colors.black87),
             decoration: InputDecoration(
               labelText: AppStrings.scanQrOrPressButton,

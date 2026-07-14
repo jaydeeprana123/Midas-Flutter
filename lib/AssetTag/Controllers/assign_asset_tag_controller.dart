@@ -27,6 +27,10 @@ class AssignAssetTagController extends GetxController {
   final assetController = TextEditingController();
   final serialController = TextEditingController();
 
+  /// Focus for the "Scan QR or RFID" field so the cursor lands there when the
+  /// screen opens.
+  final tagFocusNode = FocusNode();
+
   final selectedAssetId = Rxn<int>();
   final isSubmitting = false.obs;
   final isRfidConnected = false.obs;
@@ -40,6 +44,17 @@ class AssignAssetTagController extends GetxController {
     super.onInit();
     _loadSession();
     _initRfid();
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+    // Auto-focus the QR/RFID field once the entry transition completes.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (tagFocusNode.canRequestFocus) {
+        tagFocusNode.requestFocus();
+      }
+    });
   }
 
   Future<void> _loadSession() async {
@@ -168,6 +183,7 @@ class AssignAssetTagController extends GetxController {
   void onClose() {
     _tagSubscription?.cancel();
     rfidService.disconnect();
+    tagFocusNode.dispose();
     tagController.dispose();
     assetController.dispose();
     serialController.dispose();

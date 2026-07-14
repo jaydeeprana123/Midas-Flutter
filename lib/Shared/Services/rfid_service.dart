@@ -2,13 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
-/// Bridges the Flutter layer to the native Zebra RFID SDK (`com.zebra.rfid.api3`)
-/// that ships as `android/app/libs/API3_LIB-release-2.0.2.114.aar`.
+/// Bridges the Flutter layer to the native Chainway UHF RFID SDK
+/// (`com.rscja.deviceapi`) that ships as an aar under `android/app/libs/`.
 ///
 /// The native side is wired through a [MethodChannel] (control) and an
-/// [EventChannel] (tag/trigger stream). On platforms/devices where the reader
-/// is unavailable (emulators, non-Zebra hardware, iOS), every call degrades
-/// gracefully so the rest of the app keeps working with manual/camera input.
+/// [EventChannel] (tag stream). A hardware trigger press is handled natively in
+/// `MainActivity.dispatchKeyEvent` and pushes the scanned EPC over [tagStream];
+/// continuous inventory ([startInventory]/[stopInventory]) streams every read
+/// over the same [tagStream].
+/// On
+/// platforms/devices where the reader is unavailable (emulators, other
+/// hardware, iOS), every call degrades gracefully so the rest of the app keeps
+/// working with manual/camera input.
 class RfidService {
   static const MethodChannel _methods =
       MethodChannel('com.garima.midas/rfid');
@@ -60,6 +65,41 @@ class RfidService {
       return null;
     } on PlatformException {
       return null;
+    }
+  }
+
+  /// Starts continuous inventory. Every tag read is delivered over [tagStream].
+  /// Returns `false` if no reader is present / the bridge is unavailable.
+  Future<bool> startInventory() async {
+    try {
+      final result = await _methods.invokeMethod<bool>('startInventory');
+      return result ?? false;
+    } on MissingPluginException {
+      return false;
+    } on PlatformException {
+      return false;
+    }
+  }
+
+  /// Stops continuous inventory started by [startInventory].
+  Future<void> stopInventory() async {
+    try {
+      await _methods.invokeMethod('stopInventory');
+    } on MissingPluginException {
+      // No native bridge available; nothing to stop.
+    } on PlatformException {
+      // Ignore failures while stopping.
+    }
+  }
+
+  /// Plays a success/failure beep on the reader (same sound used for scans).
+  Future<void> beep({bool success = true}) async {
+    try {
+      await _methods.invokeMethod('beep', {'success': success});
+    } on MissingPluginException {
+      // No native bridge available; skip the beep.
+    } on PlatformException {
+      // Ignore beep failures.
     }
   }
 
