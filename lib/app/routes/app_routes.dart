@@ -13,4 +13,6 @@ abstract class AppRoutes {
   static const auditAssets = '/audit-assets';
   static const searchAsset = '/search-asset';
   static const searchAssetLookup = '/search-asset-lookup';
+  static const linkEquipmentTag = '/link-equipment-tag';
+  static const searchEquipment = '/search-equipment';
 }

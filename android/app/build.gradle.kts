@@ -49,11 +49,15 @@ dependencies {
     // (AssignQRActivity uses com.rscja.deviceapi.RFIDWithUHFUART).
     //
     // Preferred: a local copy at app/libs/DeviceAPI_ver20231208_release.aar.
-    // Fallback: reference the same aar in-place from the reference MIDAS project
-    // so the build works without a manual copy. Whichever exists is used.
+    // Fallback: reference the same aar from the native MIDAS Android project.
     val localAar = file("libs/DeviceAPI_ver20231208_release.aar")
     val referenceAar =
-        file("D:/StudioFlutterAllProject/Midas/app/libs/DeviceAPI_ver20231208_release.aar")
+        file("D:/StudioProjects/Midas/app/libs/DeviceAPI_ver20231208_release.aar")
     val chainwayAar = if (localAar.exists()) localAar else referenceAar
+    if (!chainwayAar.exists()) {
+        throw GradleException(
+            "Missing Chainway RFID AAR. Place DeviceAPI_ver20231208_release.aar in android/app/libs/",
+        )
+    }
     implementation(files(chainwayAar))
 }

@@ -16,6 +16,11 @@ import 'package:midas/AssetTag/Views/assign_asset_tag_view.dart';
 import 'package:midas/AssetTag/Views/deassign_asset_tag_view.dart';
 import 'package:midas/AssetTag/Views/identify_asset_view.dart';
 import 'package:midas/AssetTag/asset_repository.dart';
+import 'package:midas/Equipment/Controllers/link_equipment_tag_controller.dart';
+import 'package:midas/Equipment/Controllers/search_equipment_controller.dart';
+import 'package:midas/Equipment/Views/link_equipment_tag_view.dart';
+import 'package:midas/Equipment/Views/search_equipment_view.dart';
+import 'package:midas/Equipment/equipment_repository.dart';
 import 'package:midas/Location/Controllers/assign_location_tag_controller.dart';
 import 'package:midas/Location/Controllers/change_location_by_asset_controller.dart';
 import 'package:midas/Location/Controllers/change_location_by_location_controller.dart';
@@ -195,6 +200,29 @@ class AppPages {
         Get.lazyPut(
           () => SearchAssetLookupController(
             searchAssetRepository: Get.find<SearchAssetRepository>(),
+          ),
+        );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.linkEquipmentTag,
+      page: () => const LinkEquipmentTagView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => LinkEquipmentTagController(
+            equipmentRepository: Get.find<EquipmentRepository>(),
+            rfidService: Get.find<RfidService>(),
+          ),
+        );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.searchEquipment,
+      page: () => const SearchEquipmentView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => SearchEquipmentController(
+            equipmentRepository: Get.find<EquipmentRepository>(),
           ),
         );
       }),

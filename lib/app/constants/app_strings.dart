@@ -171,6 +171,22 @@ class AppStrings {
   static const identifyAssetsBeforeUpdate =
       'Please identify assets before updating location.';
 
+  // Link equipment tag
+  static const equipmentNameOrCode = 'Equipment name or code';
+  static const linkTag = 'Link Tag';
+  static const startTypingToSearchEquipment =
+      'Start typing to search equipment';
+  static const noResultsFound = 'No results found';
+  static const equipmentRequired = 'Equipment Required';
+  static const selectEquipmentFirst = 'Please select equipment first.';
+  static const equipmentTagLinkedSuccessfully =
+      'Equipment tag linked successfully.';
+  static const unableToLinkEquipmentTag = 'Unable to link equipment tag.';
+  static const unableToLinkEquipmentTagRetry =
+      'Unable to link equipment tag. Please try again.';
+  static const unableToFetchEquipmentList =
+      'Unable to fetch equipment list. Please try again.';
+
   // Search asset
   static const assetNameCodeOrTagCode = 'Asset name/code or Tag code';
   static const stopTrackingBeforeChangingAsset =

@@ -117,8 +117,13 @@ class ApiClient {
   Future<Map<String, dynamic>> postRaw(
     String path, {
     required dynamic data,
+    Map<String, dynamic>? queryParameters,
   }) async {
-    final response = await _dio.post(path, data: data);
+    final response = await _dio.post(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+    );
     return _toMap(response.data);
   }
 

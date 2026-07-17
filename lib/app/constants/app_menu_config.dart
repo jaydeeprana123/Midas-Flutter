@@ -100,6 +100,7 @@ class AppMenuConfig {
       title: AppStrings.linkEquipmentTag,
       icon: Icons.link,
       section: AppMenuSection.equipments,
+      route: AppRoutes.linkEquipmentTag,
     ),
     AppMenuItem(
       permissionLabel: 'Delink Equipment Tag',

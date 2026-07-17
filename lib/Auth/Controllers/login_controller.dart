@@ -95,8 +95,9 @@ class LoginController extends GetxController {
         return;
       }
 
-      final resolvedOrgLabel =
-          data.organizationName.isNotEmpty ? data.organizationName : orgLabel.value;
+      final resolvedOrgLabel = data.organizationName.isNotEmpty
+          ? data.organizationName
+          : orgLabel.value;
 
       await secureStorage.saveSession(
         token: data.token,
