@@ -10,6 +10,7 @@ import 'package:midas/Auth/system_repository.dart';
 import 'package:midas/Shared/Services/auth_session_service.dart';
 import 'package:midas/Shared/Services/api_client.dart';
 import 'package:midas/Shared/Services/device_service.dart';
+import 'package:midas/Shared/Services/job_card_download_service.dart';
 import 'package:midas/Shared/Services/local_storage_service.dart';
 import 'package:midas/Shared/Services/location_service.dart';
 import 'package:midas/Shared/Services/rfid_service.dart';
@@ -46,6 +47,7 @@ class InitialBinding extends Bindings {
       EquipmentRepository(apiClient),
       permanent: true,
     );
+    Get.put<JobCardDownloadService>(JobCardDownloadService(), permanent: true);
     Get.put<DeviceService>(DeviceService(), permanent: true);
     Get.put<LocationService>(LocationService(), permanent: true);
     Get.put<RfidService>(RfidService(), permanent: true);

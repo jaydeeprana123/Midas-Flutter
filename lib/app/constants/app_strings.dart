@@ -187,6 +187,33 @@ class AppStrings {
   static const unableToFetchEquipmentList =
       'Unable to fetch equipment list. Please try again.';
 
+  // Delink equipment tag
+  static const delinkTag = 'Delink Tag';
+  static const confirmDelink = 'Confirm Delink';
+  static const confirmDelinkEquipmentMessage =
+      'Are you sure you want to delink this equipment?';
+  static const yes = 'Yes';
+  static const no = 'No';
+  static const equipmentDetailsRequired = 'Equipment Details Required';
+  static const fetchDetailsBeforeDelink =
+      'Please fetch equipment details before delinking.';
+  static const unableToFetchEquipmentDetails =
+      'Unable to fetch equipment details.';
+  static const unableToFetchEquipmentDetailsRetry =
+      'Unable to fetch equipment details. Please try again.';
+  static const equipmentTagDelinkedSuccessfully =
+      'Equipment tag delinked successfully.';
+  static const unableToDelinkEquipmentTag = 'Unable to delink equipment tag.';
+  static const unableToDelinkEquipmentTagRetry =
+      'Unable to delink equipment tag. Please try again.';
+
+  // Identify equipment
+  static const jobCardNumber = 'Job Card Number';
+  static const unableToDownloadJobCardReport =
+      'Unable to download job card report.';
+  static const storagePermissionRequired =
+      'Storage permission is required to download the job card PDF.';
+
   // Search asset
   static const assetNameCodeOrTagCode = 'Asset name/code or Tag code';
   static const stopTrackingBeforeChangingAsset =

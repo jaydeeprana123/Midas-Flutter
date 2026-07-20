@@ -16,8 +16,12 @@ import 'package:midas/AssetTag/Views/assign_asset_tag_view.dart';
 import 'package:midas/AssetTag/Views/deassign_asset_tag_view.dart';
 import 'package:midas/AssetTag/Views/identify_asset_view.dart';
 import 'package:midas/AssetTag/asset_repository.dart';
+import 'package:midas/Equipment/Controllers/delink_equipment_tag_controller.dart';
+import 'package:midas/Equipment/Controllers/identify_equipment_controller.dart';
 import 'package:midas/Equipment/Controllers/link_equipment_tag_controller.dart';
 import 'package:midas/Equipment/Controllers/search_equipment_controller.dart';
+import 'package:midas/Equipment/Views/delink_equipment_tag_view.dart';
+import 'package:midas/Equipment/Views/identify_equipment_view.dart';
 import 'package:midas/Equipment/Views/link_equipment_tag_view.dart';
 import 'package:midas/Equipment/Views/search_equipment_view.dart';
 import 'package:midas/Equipment/equipment_repository.dart';
@@ -39,6 +43,7 @@ import 'package:midas/Home/Controllers/home_controller.dart';
 import 'package:midas/Home/Views/home_view.dart';
 import 'package:midas/Shared/Services/api_client.dart';
 import 'package:midas/Shared/Services/device_service.dart';
+import 'package:midas/Shared/Services/job_card_download_service.dart';
 import 'package:midas/Shared/Services/local_storage_service.dart';
 import 'package:midas/Shared/Services/location_service.dart';
 import 'package:midas/Shared/Services/rfid_service.dart';
@@ -223,6 +228,33 @@ class AppPages {
         Get.lazyPut(
           () => SearchEquipmentController(
             equipmentRepository: Get.find<EquipmentRepository>(),
+          ),
+        );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.delinkEquipmentTag,
+      page: () => const DelinkEquipmentTagView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => DelinkEquipmentTagController(
+            equipmentRepository: Get.find<EquipmentRepository>(),
+            rfidService: Get.find<RfidService>(),
+          ),
+        );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.identifyEquipment,
+      page: () => const IdentifyEquipmentView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => IdentifyEquipmentController(
+            equipmentRepository: Get.find<EquipmentRepository>(),
+            rfidService: Get.find<RfidService>(),
+            localStorage: Get.find<LocalStorageService>(),
+            secureStorage: Get.find<SecureStorageService>(),
+            jobCardDownloadService: Get.find<JobCardDownloadService>(),
           ),
         );
       }),

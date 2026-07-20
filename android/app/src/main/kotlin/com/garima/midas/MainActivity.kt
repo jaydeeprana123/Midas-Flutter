@@ -7,6 +7,7 @@ import io.flutter.embedding.engine.FlutterEngine
 
 class MainActivity : FlutterActivity() {
     private var rfidBridge: RfidBridge? = null
+    private var jobCardDownloadBridge: JobCardDownloadBridge? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -14,6 +15,19 @@ class MainActivity : FlutterActivity() {
             applicationContext,
             flutterEngine.dartExecutor.binaryMessenger,
         )
+        jobCardDownloadBridge = JobCardDownloadBridge(
+            this,
+            flutterEngine.dartExecutor.binaryMessenger,
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        jobCardDownloadBridge?.onRequestPermissionsResult(requestCode, grantResults)
     }
 
     // Chainway handheld trigger keys (same codes as the reference AssignQRActivity).

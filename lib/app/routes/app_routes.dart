@@ -15,4 +15,6 @@ abstract class AppRoutes {
   static const searchAssetLookup = '/search-asset-lookup';
   static const linkEquipmentTag = '/link-equipment-tag';
   static const searchEquipment = '/search-equipment';
+  static const delinkEquipmentTag = '/delink-equipment-tag';
+  static const identifyEquipment = '/identify-equipment';
 }

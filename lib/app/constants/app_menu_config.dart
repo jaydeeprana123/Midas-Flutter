@@ -107,12 +107,14 @@ class AppMenuConfig {
       title: AppStrings.delinkEquipmentTag,
       icon: Icons.link_off,
       section: AppMenuSection.equipments,
+      route: AppRoutes.delinkEquipmentTag,
     ),
     AppMenuItem(
       permissionLabel: 'Identify Equipment',
       title: AppStrings.identifyEquipment,
       icon: Icons.badge,
       section: AppMenuSection.equipments,
+      route: AppRoutes.identifyEquipment,
     ),
   ];
 

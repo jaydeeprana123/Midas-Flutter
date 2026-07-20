@@ -4,6 +4,8 @@ import 'package:midas/Shared/Services/app_logger.dart';
 typedef UnauthorizedCallback = Future<void> Function();
 
 class ApiClient {
+  static const defaultBaseUrl = 'https://midastestbe.garimasystem.com/';
+
   ApiClient({required String baseUrl}) : _dio = _createDio(baseUrl) {
     _dio.interceptors.add(
       InterceptorsWrapper(
