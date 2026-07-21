@@ -20,11 +20,25 @@ import 'package:midas/Equipment/Controllers/delink_equipment_tag_controller.dart
 import 'package:midas/Equipment/Controllers/identify_equipment_controller.dart';
 import 'package:midas/Equipment/Controllers/link_equipment_tag_controller.dart';
 import 'package:midas/Equipment/Controllers/search_equipment_controller.dart';
+import 'package:midas/Equipment/Controllers/search_equipment_find_controller.dart';
+import 'package:midas/Equipment/Controllers/search_tagged_equipment_controller.dart';
 import 'package:midas/Equipment/Views/delink_equipment_tag_view.dart';
 import 'package:midas/Equipment/Views/identify_equipment_view.dart';
 import 'package:midas/Equipment/Views/link_equipment_tag_view.dart';
+import 'package:midas/Equipment/Views/search_equipment_find_view.dart';
 import 'package:midas/Equipment/Views/search_equipment_view.dart';
+import 'package:midas/Equipment/Views/search_tagged_equipment_view.dart';
 import 'package:midas/Equipment/equipment_repository.dart';
+import 'package:midas/Material/Controllers/assign_material_tag_controller.dart';
+import 'package:midas/Material/Controllers/material_search_controller.dart';
+import 'package:midas/Material/Controllers/unassign_material_tag_controller.dart';
+import 'package:midas/Material/Views/assign_material_tag_view.dart';
+import 'package:midas/Material/Views/material_search_view.dart';
+import 'package:midas/Material/Views/unassign_material_tag_view.dart';
+import 'package:midas/Material/Services/material_sqlite_service.dart';
+import 'package:midas/Material/Services/material_unassign_sync_service.dart';
+import 'package:midas/Material/Services/network_connectivity_service.dart';
+import 'package:midas/Material/material_repository.dart';
 import 'package:midas/Location/Controllers/assign_location_tag_controller.dart';
 import 'package:midas/Location/Controllers/change_location_by_asset_controller.dart';
 import 'package:midas/Location/Controllers/change_location_by_location_controller.dart';
@@ -257,6 +271,64 @@ class AppPages {
             jobCardDownloadService: Get.find<JobCardDownloadService>(),
           ),
         );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.searchEquipmentFind,
+      page: () => const SearchEquipmentFindView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => SearchEquipmentFindController(
+            equipmentRepository: Get.find<EquipmentRepository>(),
+            rfidService: Get.find<RfidService>(),
+            locationService: Get.find<LocationService>(),
+          ),
+        );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.searchTaggedEquipment,
+      page: () => const SearchTaggedEquipmentView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => SearchTaggedEquipmentController(
+            equipmentRepository: Get.find<EquipmentRepository>(),
+          ),
+        );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.assignMaterialTag,
+      page: () => const AssignMaterialTagView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => AssignMaterialTagController(
+            materialRepository: Get.find<MaterialRepository>(),
+            rfidService: Get.find<RfidService>(),
+          ),
+        );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.unassignMaterialTag,
+      page: () => const UnassignMaterialTagView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => UnassignMaterialTagController(
+            materialRepository: Get.find<MaterialRepository>(),
+            rfidService: Get.find<RfidService>(),
+            sqliteService: Get.find<MaterialSqliteService>(),
+            connectivityService: Get.find<NetworkConnectivityService>(),
+            syncService: Get.find<MaterialUnassignSyncService>(),
+          ),
+        );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.materialSearch,
+      page: () => const MaterialSearchView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => MaterialSearchController());
       }),
     ),
     GetPage(

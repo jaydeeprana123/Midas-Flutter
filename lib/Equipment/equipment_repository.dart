@@ -2,6 +2,8 @@ import 'package:midas/AssetTag/Models/stock_in_response_model.dart';
 import 'package:midas/Equipment/Models/equipment_data_model.dart';
 import 'package:midas/Equipment/Models/equipment_link_request.dart';
 import 'package:midas/Equipment/Models/fetched_equipment_model.dart';
+import 'package:midas/Equipment/Models/tagged_equipment_model.dart';
+import 'package:midas/SearchAsset/Models/gps_data_model.dart';
 import 'package:midas/Shared/Services/api_client.dart';
 
 class EquipmentRepository {
@@ -19,6 +21,15 @@ class EquipmentRepository {
       queryParameters: {'IsLink': isLink},
     );
     return EquipmentDataModel.listFromResponse(json);
+  }
+
+  /// Tagged/linked equipment for Search Equipment.
+  /// `GET /api/EquipmentTagMapping/GetEquipmentTagMappings`
+  Future<List<TaggedEquipmentModel>> getEquipmentTagMappings() async {
+    final json = await _apiClient.get(
+      '/api/EquipmentTagMapping/GetEquipmentTagMappings',
+    );
+    return TaggedEquipmentModel.listFromResponse(json);
   }
 
   /// Links RFID/QR tag(s) to equipment.
@@ -57,5 +68,15 @@ class EquipmentRepository {
       data: requests.map((item) => item.toJson()).toList(),
     );
     return StockInResponseModel.fromJson(json);
+  }
+
+  /// Uploads RFID + GPS readings collected during Search Equipment.
+  /// `POST /api/GPS/InsertGPSData`
+  Future<GpsInsertResponse> insertGpsData(List<GpsDataModel> readings) async {
+    final json = await _apiClient.postRaw(
+      '/api/GPS/InsertGPSData',
+      data: readings.map((item) => item.toJson()).toList(),
+    );
+    return GpsInsertResponse.fromJson(json);
   }
 }

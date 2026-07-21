@@ -24,10 +24,12 @@ class HomeController extends GetxController {
   final isLoggingOut = false.obs;
   final assetMenuItems = <AppMenuItem>[].obs;
   final equipmentMenuItems = <AppMenuItem>[].obs;
+  final materialMenuItems = <AppMenuItem>[].obs;
   final drawerMenuItems = <AppMenuItem>[].obs;
 
   bool get showAssetsTab => assetMenuItems.isNotEmpty;
   bool get showEquipmentsTab => equipmentMenuItems.isNotEmpty;
+  bool get showMaterialsTab => materialMenuItems.isNotEmpty;
 
   @override
   void onInit() {
@@ -59,14 +61,58 @@ class HomeController extends GetxController {
         homeOnly: true,
       ),
     );
+
+    // Always show Material tab/items for all users (permission check skipped).
+    final materialItems = AppMenuConfig.items
+        .where((item) => item.section == AppMenuSection.materials)
+        .toList();
+    materialMenuItems.assignAll(
+      materialItems.where((item) => item.showOnHome),
+    );
+
     drawerMenuItems.assignAll(
       AppMenuConfig.visibleItems(labels, drawerOnly: true),
     );
+    final existingLabels =
+        drawerMenuItems.map((item) => item.permissionLabel).toSet();
+    for (final item in materialItems.where((item) => item.showInDrawer)) {
+      if (!existingLabels.contains(item.permissionLabel)) {
+        drawerMenuItems.add(item);
+      }
+    }
 
-    if (!showAssetsTab && showEquipmentsTab) {
-      selectedTab.value = 1;
-    } else if (showAssetsTab) {
+    if (showAssetsTab) {
       selectedTab.value = 0;
+    } else if (showEquipmentsTab) {
+      selectedTab.value = 1;
+    } else if (showMaterialsTab) {
+      selectedTab.value = 2;
+    }
+  }
+
+  List<AppMenuItem> itemsForTab(int tabIndex) {
+    switch (tabIndex) {
+      case 0:
+        return assetMenuItems;
+      case 1:
+        return equipmentMenuItems;
+      case 2:
+        return materialMenuItems;
+      default:
+        return const [];
+    }
+  }
+
+  String titleForTab(int tabIndex) {
+    switch (tabIndex) {
+      case 0:
+        return AppStrings.assetTrackingSystem;
+      case 1:
+        return AppStrings.equipmentMaintenanceSystem;
+      case 2:
+        return AppStrings.materialTrackingSystem;
+      default:
+        return AppStrings.assetTrackingSystem;
     }
   }
 

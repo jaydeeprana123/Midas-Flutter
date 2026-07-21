@@ -96,9 +96,8 @@ class HomeView extends GetView<HomeController> {
         ),
       ),
       body: Obx(() {
-        final currentItems = controller.selectedTab.value == 0
-            ? controller.assetMenuItems
-            : controller.equipmentMenuItems;
+        final tabIndex = controller.selectedTab.value;
+        final currentItems = controller.itemsForTab(tabIndex);
 
         return Column(
           children: [
@@ -109,9 +108,7 @@ class HomeView extends GetView<HomeController> {
               child: Column(
                 children: [
                   Text(
-                    controller.selectedTab.value == 0
-                        ? AppStrings.assetTrackingSystem
-                        : AppStrings.equipmentMaintenanceSystem,
+                    controller.titleForTab(tabIndex),
                     textAlign: TextAlign.center,
                     style: AppTextStyles.screenTitle(),
                   ),
@@ -147,7 +144,9 @@ class HomeView extends GetView<HomeController> {
                 ],
               ),
             ),
-            if (controller.showAssetsTab || controller.showEquipmentsTab)
+            if (controller.showAssetsTab ||
+                controller.showEquipmentsTab ||
+                controller.showMaterialsTab)
               Container(
                 color: Colors.white,
                 child: Row(
@@ -155,14 +154,20 @@ class HomeView extends GetView<HomeController> {
                     if (controller.showAssetsTab)
                       _TabHeader(
                         text: AppStrings.assetsTab,
-                        selected: controller.selectedTab.value == 0,
+                        selected: tabIndex == 0,
                         onTap: () => controller.onTabChanged(0),
                       ),
                     if (controller.showEquipmentsTab)
                       _TabHeader(
                         text: AppStrings.equipmentsTab,
-                        selected: controller.selectedTab.value == 1,
+                        selected: tabIndex == 1,
                         onTap: () => controller.onTabChanged(1),
+                      ),
+                    if (controller.showMaterialsTab)
+                      _TabHeader(
+                        text: AppStrings.materialsTab,
+                        selected: tabIndex == 2,
+                        onTap: () => controller.onTabChanged(2),
                       ),
                   ],
                 ),

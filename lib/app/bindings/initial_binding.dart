@@ -3,6 +3,10 @@ import 'package:get_storage/get_storage.dart';
 import 'package:midas/AssetTag/asset_repository.dart';
 import 'package:midas/Audit/audit_repository.dart';
 import 'package:midas/Equipment/equipment_repository.dart';
+import 'package:midas/Material/material_repository.dart';
+import 'package:midas/Material/Services/material_sqlite_service.dart';
+import 'package:midas/Material/Services/material_unassign_sync_service.dart';
+import 'package:midas/Material/Services/network_connectivity_service.dart';
 import 'package:midas/SearchAsset/search_asset_repository.dart';
 import 'package:midas/Location/location_repository.dart';
 import 'package:midas/Auth/auth_repository.dart';
@@ -45,6 +49,23 @@ class InitialBinding extends Bindings {
     Get.put<LocationRepository>(LocationRepository(apiClient), permanent: true);
     Get.put<EquipmentRepository>(
       EquipmentRepository(apiClient),
+      permanent: true,
+    );
+    Get.put<MaterialRepository>(
+      MaterialRepository(apiClient),
+      permanent: true,
+    );
+    Get.put<MaterialSqliteService>(MaterialSqliteService(), permanent: true);
+    Get.put<NetworkConnectivityService>(
+      NetworkConnectivityService(),
+      permanent: true,
+    );
+    Get.put<MaterialUnassignSyncService>(
+      MaterialUnassignSyncService(
+        materialRepository: Get.find<MaterialRepository>(),
+        sqliteService: Get.find<MaterialSqliteService>(),
+        connectivityService: Get.find<NetworkConnectivityService>(),
+      ),
       permanent: true,
     );
     Get.put<JobCardDownloadService>(JobCardDownloadService(), permanent: true);

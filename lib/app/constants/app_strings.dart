@@ -36,6 +36,8 @@ class AppStrings {
   static const assetTrackingSystem = 'Asset Tracking and Management\nSystem';
   static const equipmentMaintenanceSystem =
       'Equipment Maintenance Management\nSystem';
+  static const materialTrackingSystem =
+      'Material Tracking and Management\nSystem';
 
   // Login
   static const userName = 'User Name';
@@ -54,6 +56,7 @@ class AppStrings {
   static const dashboard = 'Dashboard';
   static const assetsTab = 'ASSETS';
   static const equipmentsTab = 'EQUIPMENTS';
+  static const materialsTab = 'MATERIAL';
   static const noModulesAvailable = 'No modules available for your account.';
 
   // Menu titles
@@ -68,6 +71,67 @@ class AppStrings {
   static const linkEquipmentTag = 'Link Equipment Tag';
   static const delinkEquipmentTag = 'Delink Equipment Tag';
   static const identifyEquipment = 'Identify Equipment';
+  static const searchEquipment = 'Search Equipment';
+  static const materialAssignTag = 'Material Assign Tag';
+  static const materialUnassignTag = 'Material Unassign Tag';
+
+  // Material assign tag
+  static const selectSource = 'Select Source';
+  static const selectMaterial = 'Select Material';
+  static const searchSelectMaterial = 'Search / Select Material';
+  static const scanEnterTag = 'Scan / Enter Tag';
+  static const scanTagHere = 'Scan Tag Here';
+  static const sourceGrn = 'GRN';
+  static const sourceInwardQc = 'Inward QC';
+  static const sourceJobWork = 'Job Work';
+  static const sourceFinishGoods = 'Finish Goods';
+  static const sourceIntermediate = 'Intermediate';
+  static const sourceRequired = 'Source Required';
+  static const selectSourceFirst = 'Please select a source first.';
+  static const materialRequired = 'Material Required';
+  static const selectMaterialFirst = 'Please select a material first.';
+  static const startTypingToSearchMaterial =
+      'Start typing to search materials';
+  static const noMaterialsFound = 'No Materials Found';
+  static const noMaterialsForSelectedSource =
+      'No materials found for the selected source.';
+  static const unableToFetchMaterialsRetry =
+      'Unable to fetch materials. Please try again.';
+  static const materialTagAssignedSuccessfully =
+      'Material tag assigned successfully.';
+  static const unableToAssignMaterialTag = 'Unable to assign material tag.';
+  static const unableToAssignMaterialTagRetry =
+      'Unable to assign material tag. Please try again.';
+
+  // Material unassign tag
+  static const unassignTag = 'Unassign Tag';
+  static const scanQrHere = 'Scan QR Here';
+  static const materialDetails = 'Material Details';
+  static const materialNameLabel = 'Material Name';
+  static const materialCodeLabel = 'Material Code';
+  static const tagCodeLabel = 'Tag Code';
+  static const locationLabel = 'Location';
+  static const materialDetailsRequired = 'Material Details Required';
+  static const fetchDetailsBeforeUnassign =
+      'Please fetch material details before unassigning.';
+  static const unableToFetchMaterialDetails =
+      'Unable to fetch material details.';
+  static const unableToFetchMaterialDetailsRetry =
+      'Unable to fetch material details. Please try again.';
+  static const materialTagDetailsNotFound =
+      'No material details found for this tag.';
+  static const noOfflineMaterialDetails =
+      'No internet connection and no saved material details for this tag.';
+  static const unassignFailed = 'Unassign Failed';
+  static const materialTagUnassignedSuccessfully =
+      'Material tag unassigned successfully.';
+  static const unableToUnassignMaterialTag =
+      'Unable to unassign material tag.';
+  static const unableToUnassignMaterialTagRetry =
+      'Unable to unassign material tag. Please try again.';
+  static const savedForSync = 'Saved for Sync';
+  static const materialUnassignSavedOffline =
+      'No internet connection. The unassign request has been saved and will be synced automatically.';
 
   // Logout dialog
   static const logoutConfirmation = 'Are you sure you want to logout?';
@@ -213,6 +277,17 @@ class AppStrings {
       'Unable to download job card report.';
   static const storagePermissionRequired =
       'Storage permission is required to download the job card PDF.';
+
+  // Search equipment (find / track)
+  static const stopTrackingBeforeChangingEquipment =
+      'Please stop the ongoing scan to select another equipment.';
+  static const stopTrackingBeforeGoingBack =
+      'Please stop the Search Equipment process before going back.';
+  static const unableToStartEquipmentTracking =
+      'Unable to start equipment tracking. Please try again.';
+  static const uploadingDataToServer = 'Uploading data to server...';
+  static const noEquipmentTrackingDataScanned =
+      'Scanning has been stopped. No data is scanned.';
 
   // Search asset
   static const assetNameCodeOrTagCode = 'Asset name/code or Tag code';

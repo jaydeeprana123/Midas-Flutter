@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:midas/app/constants/app_strings.dart';
 import 'package:midas/app/routes/app_routes.dart';
 
-enum AppMenuSection { assets, equipments }
+enum AppMenuSection { assets, equipments, materials }
 
 class AppMenuItem {
   const AppMenuItem({
@@ -115,6 +115,27 @@ class AppMenuConfig {
       icon: Icons.badge,
       section: AppMenuSection.equipments,
       route: AppRoutes.identifyEquipment,
+    ),
+    AppMenuItem(
+      permissionLabel: 'Search Equipment',
+      title: AppStrings.searchEquipment,
+      icon: Icons.find_in_page,
+      section: AppMenuSection.equipments,
+      route: AppRoutes.searchEquipmentFind,
+    ),
+    AppMenuItem(
+      permissionLabel: 'Link Material Tag',
+      title: AppStrings.materialAssignTag,
+      icon: Icons.qr_code_scanner,
+      section: AppMenuSection.materials,
+      route: AppRoutes.assignMaterialTag,
+    ),
+    AppMenuItem(
+      permissionLabel: 'Unlink Material Tag',
+      title: AppStrings.materialUnassignTag,
+      icon: Icons.qr_code_2,
+      section: AppMenuSection.materials,
+      route: AppRoutes.unassignMaterialTag,
     ),
   ];
 
