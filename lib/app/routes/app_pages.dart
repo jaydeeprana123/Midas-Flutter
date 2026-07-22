@@ -29,9 +29,11 @@ import 'package:midas/Equipment/Views/search_equipment_find_view.dart';
 import 'package:midas/Equipment/Views/search_equipment_view.dart';
 import 'package:midas/Equipment/Views/search_tagged_equipment_view.dart';
 import 'package:midas/Equipment/equipment_repository.dart';
+import 'package:midas/Material/Controllers/assign_material_location_tag_controller.dart';
 import 'package:midas/Material/Controllers/assign_material_tag_controller.dart';
 import 'package:midas/Material/Controllers/material_search_controller.dart';
 import 'package:midas/Material/Controllers/unassign_material_tag_controller.dart';
+import 'package:midas/Material/Views/assign_material_location_tag_view.dart';
 import 'package:midas/Material/Views/assign_material_tag_view.dart';
 import 'package:midas/Material/Views/material_search_view.dart';
 import 'package:midas/Material/Views/unassign_material_tag_view.dart';
@@ -305,6 +307,9 @@ class AppPages {
           () => AssignMaterialTagController(
             materialRepository: Get.find<MaterialRepository>(),
             rfidService: Get.find<RfidService>(),
+            sqliteService: Get.find<MaterialSqliteService>(),
+            connectivityService: Get.find<NetworkConnectivityService>(),
+            syncService: Get.find<MaterialUnassignSyncService>(),
           ),
         );
       }),
@@ -315,6 +320,21 @@ class AppPages {
       binding: BindingsBuilder(() {
         Get.lazyPut(
           () => UnassignMaterialTagController(
+            materialRepository: Get.find<MaterialRepository>(),
+            rfidService: Get.find<RfidService>(),
+            sqliteService: Get.find<MaterialSqliteService>(),
+            connectivityService: Get.find<NetworkConnectivityService>(),
+            syncService: Get.find<MaterialUnassignSyncService>(),
+          ),
+        );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.assignMaterialLocationTag,
+      page: () => const AssignMaterialLocationTagView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => AssignMaterialLocationTagController(
             materialRepository: Get.find<MaterialRepository>(),
             rfidService: Get.find<RfidService>(),
             sqliteService: Get.find<MaterialSqliteService>(),

@@ -4,7 +4,7 @@ import 'package:midas/Material/Services/network_connectivity_service.dart';
 import 'package:midas/Material/material_repository.dart';
 import 'package:midas/Shared/Services/app_logger.dart';
 
-/// Continuously syncs pending material unassign requests when online.
+/// Syncs pending material offline operations when connectivity returns.
 class MaterialUnassignSyncService extends GetxService {
   MaterialUnassignSyncService({
     required this.materialRepository,
@@ -16,62 +16,135 @@ class MaterialUnassignSyncService extends GetxService {
   final MaterialSqliteService sqliteService;
   final NetworkConnectivityService connectivityService;
 
+  final isSyncing = false.obs;
+
   Worker? _onlineWorker;
-  bool _isSyncing = false;
+  bool _syncInProgress = false;
 
   @override
   void onInit() {
     super.onInit();
     _onlineWorker = ever(connectivityService.isOnline, (online) {
       if (online == true) {
-        syncPendingUnassigns();
+        syncPendingOperations();
       }
     });
     if (connectivityService.isOnline.value) {
-      syncPendingUnassigns();
+      syncPendingOperations();
     }
   }
 
-  Future<void> syncPendingUnassigns() async {
-    if (_isSyncing) return;
+  Future<void> syncPendingOperations() async {
+    if (_syncInProgress) return;
     if (!await connectivityService.refresh()) return;
 
-    _isSyncing = true;
+    _syncInProgress = true;
+    isSyncing.value = true;
     try {
-      final pending = await sqliteService.getPendingUnassigns();
-      for (final record in pending) {
-        if (!connectivityService.isOnline.value) break;
-        if (record.id == null || record.detailIds.isEmpty) continue;
-
-        try {
-          final response = await materialRepository.deLinkMaterialTag(
-            detailIds: record.detailIds,
-          );
-          if (response.succeeded) {
-            await sqliteService.markPendingUnassignSynced(record.id!);
-            final tag = record.tagCode;
-            if (tag != null && tag.isNotEmpty) {
-              await sqliteService.deleteMaterialTagDetailsByTagCode(tag);
-            }
-            AppLogger.info(
-              'Synced pending material unassign id=${record.id}',
-            );
-          } else {
-            AppLogger.info(
-              'Pending material unassign id=${record.id} failed: '
-              '${response.message}',
-            );
-          }
-        } catch (e) {
-          AppLogger.info(
-            'Pending material unassign id=${record.id} error: $e',
-          );
-          // Keep record for retry when connectivity returns.
-          break;
-        }
-      }
+      await _syncPendingAssignTags();
+      await _syncPendingUnassigns();
+      await _syncPendingLinkLocations();
     } finally {
-      _isSyncing = false;
+      _syncInProgress = false;
+      isSyncing.value = false;
+    }
+  }
+
+  Future<void> syncPendingUnassigns() => syncPendingOperations();
+
+  Future<void> _syncPendingAssignTags() async {
+    final pending = await sqliteService.getPendingAssignTags();
+    for (final record in pending) {
+      if (!connectivityService.isOnline.value) break;
+      if (record.id == null) continue;
+
+      try {
+        final response = await materialRepository.insertMaterialTagging(
+          record.request,
+        );
+        if (response.succeeded) {
+          await sqliteService.markPendingAssignTagSynced(record.id!);
+          AppLogger.info(
+            'Synced pending material assign tag id=${record.id}',
+          );
+        } else {
+          AppLogger.info(
+            'Pending material assign tag id=${record.id} failed: '
+            '${response.message}',
+          );
+        }
+      } catch (e) {
+        AppLogger.info(
+          'Pending material assign tag id=${record.id} error: $e',
+        );
+      }
+    }
+  }
+
+  Future<void> _syncPendingUnassigns() async {
+    final pending = await sqliteService.getPendingUnassigns();
+    for (final record in pending) {
+      if (!connectivityService.isOnline.value) break;
+      if (record.id == null || record.detailIds.isEmpty) continue;
+
+      try {
+        final response = await materialRepository.deLinkMaterialTag(
+          detailIds: record.detailIds,
+        );
+        if (response.succeeded) {
+          await sqliteService.markPendingUnassignSynced(record.id!);
+          final tag = record.tagCode;
+          if (tag != null && tag.isNotEmpty) {
+            await sqliteService.deleteMaterialTagDetailsByTagCode(tag);
+          }
+          AppLogger.info(
+            'Synced pending material unassign id=${record.id}',
+          );
+        } else {
+          AppLogger.info(
+            'Pending material unassign id=${record.id} failed: '
+            '${response.message}',
+          );
+        }
+      } catch (e) {
+        AppLogger.info(
+          'Pending material unassign id=${record.id} error: $e',
+        );
+      }
+    }
+  }
+
+  Future<void> _syncPendingLinkLocations() async {
+    final pending = await sqliteService.getPendingLinkLocations();
+    for (final record in pending) {
+      if (!connectivityService.isOnline.value) break;
+      if (record.id == null ||
+          record.detailIds.isEmpty ||
+          record.locationCode.isEmpty) {
+        continue;
+      }
+
+      try {
+        final response = await materialRepository.linkMaterialLocation(
+          locationCode: record.locationCode,
+          detailIds: record.detailIds,
+        );
+        if (response.succeeded) {
+          await sqliteService.markPendingLinkLocationSynced(record.id!);
+          AppLogger.info(
+            'Synced pending material link location id=${record.id}',
+          );
+        } else {
+          AppLogger.info(
+            'Pending material link location id=${record.id} failed: '
+            '${response.message}',
+          );
+        }
+      } catch (e) {
+        AppLogger.info(
+          'Pending material link location id=${record.id} error: $e',
+        );
+      }
     }
   }
 

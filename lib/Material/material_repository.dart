@@ -65,6 +65,20 @@ class MaterialRepository {
     return StockInResponseModel.fromJson(json);
   }
 
+  /// Links material tag detail(s) to a location.
+  /// `POST /api/MaterialTagging/LinkMaterialLocation?LocationCode=`
+  Future<StockInResponseModel> linkMaterialLocation({
+    required String locationCode,
+    required List<int> detailIds,
+  }) async {
+    final json = await _apiClient.postRaw(
+      '/api/MaterialTagging/LinkMaterialLocation',
+      data: detailIds,
+      queryParameters: {'LocationCode': locationCode},
+    );
+    return StockInResponseModel.fromJson(json);
+  }
+
   static int? _toInt(dynamic value) {
     if (value is int) return value;
     if (value is String) return int.tryParse(value);

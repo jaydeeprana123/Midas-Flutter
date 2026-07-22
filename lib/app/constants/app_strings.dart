@@ -74,6 +74,7 @@ class AppStrings {
   static const searchEquipment = 'Search Equipment';
   static const materialAssignTag = 'Material Assign Tag';
   static const materialUnassignTag = 'Material Unassign Tag';
+  static const materialAssignLocationTag = 'Assign Location Tag';
 
   // Material assign tag
   static const selectSource = 'Select Source';
@@ -102,6 +103,13 @@ class AppStrings {
   static const unableToAssignMaterialTag = 'Unable to assign material tag.';
   static const unableToAssignMaterialTagRetry =
       'Unable to assign material tag. Please try again.';
+  static const noOfflineMaterialsForSource =
+      'No internet connection and no saved materials for this source.';
+  static const materialAssignSavedOffline =
+      'No internet connection. Tag assignment has been saved locally and will be synchronized automatically.';
+  static const materialAssignAlreadyPending =
+      'This tag assignment is already saved and waiting to sync.';
+  static const syncingInBackground = 'Syncing saved material data...';
 
   // Material unassign tag
   static const unassignTag = 'Unassign Tag';
@@ -132,6 +140,20 @@ class AppStrings {
   static const savedForSync = 'Saved for Sync';
   static const materialUnassignSavedOffline =
       'No internet connection. The unassign request has been saved and will be synced automatically.';
+  static const scanMaterialTagQr = 'Scan Material / Tag QR';
+  static const scanMaterialTagQrRequired =
+      'Please scan or enter a material / tag QR value.';
+  static const assignLocationWithMaterial = 'Assign Location with Material';
+  static const fetchDetailsBeforeAssignLocation =
+      'Please fetch material details before assigning location.';
+  static const materialLocationAssignedSuccessfully =
+      'Material location assigned successfully.';
+  static const unableToAssignMaterialLocation =
+      'Unable to assign material location.';
+  static const unableToAssignMaterialLocationRetry =
+      'Unable to assign material location. Please try again.';
+  static const materialLinkLocationSavedOffline =
+      'No internet connection. The assign location request has been saved and will be synced automatically.';
 
   // Logout dialog
   static const logoutConfirmation = 'Are you sure you want to logout?';

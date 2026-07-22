@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:midas/AssetTag/Views/qr_scanner_view.dart';
 import 'package:midas/Material/Models/material_tagging_detail_model.dart';
-import 'package:midas/Material/Models/pending_material_unassign_model.dart';
+import 'package:midas/Material/Models/pending_material_link_location_model.dart';
 import 'package:midas/Material/Services/material_sqlite_service.dart';
 import 'package:midas/Material/Services/material_unassign_sync_service.dart';
 import 'package:midas/Material/Services/network_connectivity_service.dart';
@@ -13,8 +13,10 @@ import 'package:midas/Material/material_repository.dart';
 import 'package:midas/Shared/Services/rfid_service.dart';
 import 'package:midas/app/constants/app_strings.dart';
 
-class UnassignMaterialTagController extends GetxController {
-  UnassignMaterialTagController({
+enum _ScanField { location, materialTag }
+
+class AssignMaterialLocationTagController extends GetxController {
+  AssignMaterialLocationTagController({
     required this.materialRepository,
     required this.rfidService,
     required this.sqliteService,
@@ -28,20 +30,26 @@ class UnassignMaterialTagController extends GetxController {
   final NetworkConnectivityService connectivityService;
   final MaterialUnassignSyncService syncService;
 
-  final tagController = TextEditingController();
-  final tagFocusNode = FocusNode();
+  final locationController = TextEditingController();
+  final materialTagController = TextEditingController();
+  final locationFocusNode = FocusNode();
+  final materialTagFocusNode = FocusNode();
 
   final materialDetails = Rxn<MaterialTaggingDetailModel>();
   final isFetching = false.obs;
-  final isUnassigning = false.obs;
+  final isAssigning = false.obs;
   final isRfidConnected = false.obs;
 
+  _ScanField _activeField = _ScanField.location;
   StreamSubscription<String>? _tagSubscription;
 
   @override
   void onInit() {
     super.onInit();
-    tagController.addListener(_onTagChanged);
+    locationController.addListener(_onInputsChanged);
+    materialTagController.addListener(_onInputsChanged);
+    locationFocusNode.addListener(_onLocationFocusChanged);
+    materialTagFocusNode.addListener(_onMaterialTagFocusChanged);
     _initRfid();
   }
 
@@ -49,7 +57,7 @@ class UnassignMaterialTagController extends GetxController {
   void onReady() {
     super.onReady();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _focusTagField();
+      _focusLocationField();
     });
   }
 
@@ -58,38 +66,97 @@ class UnassignMaterialTagController extends GetxController {
     isRfidConnected.value = await rfidService.connect();
   }
 
-  void _onTagChanged() {
+  void _onLocationFocusChanged() {
+    if (locationFocusNode.hasFocus) {
+      _activeField = _ScanField.location;
+    }
+  }
+
+  void _onMaterialTagFocusChanged() {
+    if (materialTagFocusNode.hasFocus) {
+      _activeField = _ScanField.materialTag;
+    }
+  }
+
+  void _onInputsChanged() {
     materialDetails.value = null;
   }
 
   void _onTagRead(String tag) {
     if (tag.isEmpty) return;
-    tagController.text = tag;
-    tagController.selection = TextSelection.collapsed(offset: tag.length);
-    _focusTagField();
+    _applyScannedValue(tag);
     rfidService.beep(success: true);
   }
 
-  void _focusTagField() {
-    if (tagFocusNode.canRequestFocus) {
-      tagFocusNode.requestFocus();
+  void _applyScannedValue(String value) {
+    if (_activeField == _ScanField.location ||
+        locationController.text.trim().isEmpty) {
+      locationController.text = value;
+      locationController.selection =
+          TextSelection.collapsed(offset: value.length);
+      _activeField = _ScanField.materialTag;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _focusMaterialTagField();
+      });
+      return;
+    }
+
+    materialTagController.text = value;
+    materialTagController.selection =
+        TextSelection.collapsed(offset: value.length);
+    _focusMaterialTagField();
+  }
+
+  void _focusLocationField() {
+    _activeField = _ScanField.location;
+    if (locationFocusNode.canRequestFocus) {
+      locationFocusNode.requestFocus();
     }
   }
 
-  Future<void> scanQr() async {
+  void _focusMaterialTagField() {
+    _activeField = _ScanField.materialTag;
+    if (materialTagFocusNode.canRequestFocus) {
+      materialTagFocusNode.requestFocus();
+    }
+  }
+
+  Future<void> scanLocationQr() async {
+    _activeField = _ScanField.location;
     final code = await Get.to<String>(() => const QrScannerView());
     if (code != null && code.isNotEmpty) {
-      tagController.text = code;
-      _focusTagField();
+      locationController.text = code;
+      _activeField = _ScanField.materialTag;
+      _focusMaterialTagField();
     }
   }
 
+  Future<void> scanMaterialTagQr() async {
+    _activeField = _ScanField.materialTag;
+    final code = await Get.to<String>(() => const QrScannerView());
+    if (code != null && code.isNotEmpty) {
+      materialTagController.text = code;
+      _focusMaterialTagField();
+    }
+  }
+
+
   Future<void> fetchDetails() async {
-    final tag = tagController.text.trim();
+    final locationCode = locationController.text.trim();
+    final tag = materialTagController.text.trim();
+
+    if (locationCode.isEmpty) {
+      Get.snackbar(
+        AppStrings.locationRequired,
+        AppStrings.enterLocationQrRfid,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
     if (tag.isEmpty) {
       Get.snackbar(
         AppStrings.qrRfidRequired,
-        AppStrings.scanOrEnterQrRfid,
+        AppStrings.scanMaterialTagQrRequired,
         snackPosition: SnackPosition.BOTTOM,
       );
       return;
@@ -126,7 +193,6 @@ class UnassignMaterialTagController extends GetxController {
         return;
       }
 
-      // Cache full response locally for offline access.
       await sqliteService.upsertMaterialTagDetails(result.items);
 
       final match = MaterialTaggingDetailModel.findByTagCode(result.items, tag);
@@ -141,7 +207,6 @@ class UnassignMaterialTagController extends GetxController {
 
       materialDetails.value = match;
     } on DioException catch (e) {
-      // Fall back to SQLite if the network request fails.
       final cached = await sqliteService.getMaterialTagDetailsByTagCode(tag);
       if (cached != null) {
         materialDetails.value = cached;
@@ -182,13 +247,14 @@ class UnassignMaterialTagController extends GetxController {
     );
   }
 
-  Future<void> unassignTag() async {
-    final tag = tagController.text.trim();
+  Future<void> assignLocationWithMaterial() async {
+    final locationCode = locationController.text.trim();
     final details = materialDetails.value;
-    if (tag.isEmpty) {
+
+    if (locationCode.isEmpty) {
       Get.snackbar(
-        AppStrings.qrRfidRequired,
-        AppStrings.scanOrEnterQrRfid,
+        AppStrings.locationRequired,
+        AppStrings.enterLocationQrRfid,
         snackPosition: SnackPosition.BOTTOM,
       );
       return;
@@ -196,86 +262,91 @@ class UnassignMaterialTagController extends GetxController {
     if (details == null) {
       Get.snackbar(
         AppStrings.materialDetailsRequired,
-        AppStrings.fetchDetailsBeforeUnassign,
+        AppStrings.fetchDetailsBeforeAssignLocation,
         snackPosition: SnackPosition.BOTTOM,
       );
       return;
     }
 
-    isUnassigning.value = true;
+    isAssigning.value = true;
     try {
       final online = await connectivityService.refresh();
       if (online) {
-        await _unassignOnline(details);
+        await _assignOnline(locationCode, details);
       } else {
-        await _unassignOffline(details);
+        await _assignOffline(locationCode, details);
       }
     } finally {
-      isUnassigning.value = false;
+      isAssigning.value = false;
     }
   }
 
-  Future<void> _unassignOnline(MaterialTaggingDetailModel details) async {
+  Future<void> _assignOnline(
+    String locationCode,
+    MaterialTaggingDetailModel details,
+  ) async {
     try {
-      final response = await materialRepository.deLinkMaterialTag(
+      final response = await materialRepository.linkMaterialLocation(
+        locationCode: locationCode,
         detailIds: [details.detailId],
       );
 
       if (response.succeeded) {
-        await sqliteService.deleteMaterialTagDetailsByTagCode(details.tagCode);
         Get.snackbar(
           AppStrings.success,
           response.message.isNotEmpty
               ? response.message
-              : AppStrings.materialTagUnassignedSuccessfully,
+              : AppStrings.materialLocationAssignedSuccessfully,
           snackPosition: SnackPosition.BOTTOM,
         );
         _resetForm();
         await syncService.syncPendingOperations();
       } else {
         Get.snackbar(
-          AppStrings.unassignFailed,
+          AppStrings.assignFailed,
           response.message.isNotEmpty
               ? response.message
-              : AppStrings.unableToUnassignMaterialTag,
+              : AppStrings.unableToAssignMaterialLocation,
           snackPosition: SnackPosition.BOTTOM,
         );
       }
     } on DioException catch (e) {
-      // Treat connection failures as offline pending sync.
       if (_isNetworkFailure(e)) {
-        await _unassignOffline(details);
+        await _assignOffline(locationCode, details);
         return;
       }
       final data = e.response?.data;
       Get.snackbar(
-        AppStrings.unassignFailed,
+        AppStrings.assignFailed,
         data is Map && data['message'] != null
             ? data['message'].toString()
-            : AppStrings.unableToUnassignMaterialTagRetry,
+            : AppStrings.unableToAssignMaterialLocationRetry,
         snackPosition: SnackPosition.BOTTOM,
       );
     } catch (_) {
       Get.snackbar(
-        AppStrings.unassignFailed,
-        AppStrings.unableToUnassignMaterialTagRetry,
+        AppStrings.assignFailed,
+        AppStrings.unableToAssignMaterialLocationRetry,
         snackPosition: SnackPosition.BOTTOM,
       );
     }
   }
 
-  Future<void> _unassignOffline(MaterialTaggingDetailModel details) async {
-    await sqliteService.insertPendingUnassign(
-      PendingMaterialUnassignModel(
+  Future<void> _assignOffline(
+    String locationCode,
+    MaterialTaggingDetailModel details,
+  ) async {
+    await sqliteService.insertPendingLinkLocation(
+      PendingMaterialLinkLocationModel(
+        locationCode: locationCode,
         detailIds: [details.detailId],
         tagCode: details.tagCode,
       ),
     );
-    await sqliteService.deleteMaterialTagDetailsByTagCode(details.tagCode);
 
     Get.snackbar(
       AppStrings.savedForSync,
-      AppStrings.materialUnassignSavedOffline,
+      AppStrings.materialLinkLocationSavedOffline,
       snackPosition: SnackPosition.BOTTOM,
       duration: const Duration(seconds: 4),
     );
@@ -289,20 +360,27 @@ class UnassignMaterialTagController extends GetxController {
   }
 
   void _resetForm() {
-    tagController.clear();
+    locationController.clear();
+    materialTagController.clear();
     materialDetails.value = null;
+    _activeField = _ScanField.location;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _focusTagField();
+      _focusLocationField();
     });
   }
 
   @override
   void onClose() {
-    tagController.removeListener(_onTagChanged);
+    locationController.removeListener(_onInputsChanged);
+    materialTagController.removeListener(_onInputsChanged);
+    locationFocusNode.removeListener(_onLocationFocusChanged);
+    materialTagFocusNode.removeListener(_onMaterialTagFocusChanged);
     _tagSubscription?.cancel();
     rfidService.disconnect();
-    tagFocusNode.dispose();
-    tagController.dispose();
+    locationFocusNode.dispose();
+    materialTagFocusNode.dispose();
+    locationController.dispose();
+    materialTagController.dispose();
     super.onClose();
   }
 }

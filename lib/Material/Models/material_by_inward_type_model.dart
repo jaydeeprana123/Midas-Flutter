@@ -90,4 +90,32 @@ class MaterialByInwardTypeModel {
     final text = _str(value);
     return text.isEmpty ? null : text;
   }
+
+  Map<String, dynamic> toSqliteMap(int inwardTypeId) => {
+        'inward_type_id': inwardTypeId,
+        'material_row_id': id,
+        'material_id': materialId,
+        'material_name': materialName,
+        'code': code,
+        'uom': uom,
+        'uo_mid': uoMid,
+        'quantity': quantity,
+        'tagged_quantity': taggedQuantity,
+        'remarks': remarks,
+      };
+
+  factory MaterialByInwardTypeModel.fromSqlite(Map<String, dynamic> row) {
+    return MaterialByInwardTypeModel(
+      id: _toInt(row['material_row_id']) ?? 0,
+      materialId: _toInt(row['material_id']) ?? 0,
+      materialName: _str(row['material_name']),
+      code: _str(row['code']),
+      uom: _nullableStr(row['uom']),
+      inwardTypeId: _toInt(row['inward_type_id']),
+      uoMid: _toInt(row['uo_mid']),
+      quantity: _toDouble(row['quantity']) ?? 0,
+      taggedQuantity: _toDouble(row['tagged_quantity']) ?? 0,
+      remarks: _nullableStr(row['remarks']),
+    );
+  }
 }

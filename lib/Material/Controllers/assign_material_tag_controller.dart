@@ -7,6 +7,10 @@ import 'package:midas/AssetTag/Views/qr_scanner_view.dart';
 import 'package:midas/Material/Models/add_material_tagging_request.dart';
 import 'package:midas/Material/Models/material_by_inward_type_model.dart';
 import 'package:midas/Material/Models/material_inward_source.dart';
+import 'package:midas/Material/Models/pending_material_assign_tag_model.dart';
+import 'package:midas/Material/Services/material_sqlite_service.dart';
+import 'package:midas/Material/Services/material_unassign_sync_service.dart';
+import 'package:midas/Material/Services/network_connectivity_service.dart';
 import 'package:midas/Material/material_repository.dart';
 import 'package:midas/Shared/Services/rfid_service.dart';
 import 'package:midas/app/constants/app_strings.dart';
@@ -16,10 +20,16 @@ class AssignMaterialTagController extends GetxController {
   AssignMaterialTagController({
     required this.materialRepository,
     required this.rfidService,
+    required this.sqliteService,
+    required this.connectivityService,
+    required this.syncService,
   });
 
   final MaterialRepository materialRepository;
   final RfidService rfidService;
+  final MaterialSqliteService sqliteService;
+  final NetworkConnectivityService connectivityService;
+  final MaterialUnassignSyncService syncService;
 
   final materialController = TextEditingController();
   final tagController = TextEditingController();
@@ -70,11 +80,30 @@ class AssignMaterialTagController extends GetxController {
 
     isLoadingMaterials.value = true;
     try {
+      final online = await connectivityService.refresh();
+      if (online) {
+        await _loadMaterialsOnline(source.id);
+      } else {
+        await _loadMaterialsOffline(source.id);
+      }
+    } finally {
+      isLoadingMaterials.value = false;
+    }
+  }
+
+  Future<void> _loadMaterialsOnline(int sourceId) async {
+    try {
       final result = await materialRepository.getAllMaterialByInwardTypeId(
-        source.id,
+        sourceId,
       );
       materials.assignAll(result);
+      await sqliteService.replaceMaterialsForSourceId(sourceId, result);
     } on DioException catch (e) {
+      final cached = await sqliteService.getMaterialsBySourceId(sourceId);
+      if (cached.isNotEmpty) {
+        materials.assignAll(cached);
+        return;
+      }
       final data = e.response?.data;
       Get.snackbar(
         AppStrings.fetchFailed,
@@ -84,14 +113,30 @@ class AssignMaterialTagController extends GetxController {
         snackPosition: SnackPosition.BOTTOM,
       );
     } catch (_) {
+      final cached = await sqliteService.getMaterialsBySourceId(sourceId);
+      if (cached.isNotEmpty) {
+        materials.assignAll(cached);
+        return;
+      }
       Get.snackbar(
         AppStrings.fetchFailed,
         AppStrings.unableToFetchMaterialsRetry,
         snackPosition: SnackPosition.BOTTOM,
       );
-    } finally {
-      isLoadingMaterials.value = false;
     }
+  }
+
+  Future<void> _loadMaterialsOffline(int sourceId) async {
+    final cached = await sqliteService.getMaterialsBySourceId(sourceId);
+    if (cached.isNotEmpty) {
+      materials.assignAll(cached);
+      return;
+    }
+    Get.snackbar(
+      AppStrings.fetchFailed,
+      AppStrings.noOfflineMaterialsForSource,
+      snackPosition: SnackPosition.BOTTOM,
+    );
   }
 
   Future<void> openMaterialSearch() async {
@@ -134,6 +179,22 @@ class AssignMaterialTagController extends GetxController {
     }
   }
 
+  AddMaterialTaggingRequest _buildRequest({
+    required MaterialInwardSource source,
+    required MaterialByInwardTypeModel material,
+    required String tag,
+  }) {
+    return AddMaterialTaggingRequest(
+      inwardTypeId: source.id,
+      inwardId: material.id > 0 ? material.id : null,
+      materialId: material.materialId,
+      quantity: 1,
+      materialTagingDetails: [
+        AddMaterialTaggingDetails(tagCode: tag),
+      ],
+    );
+  }
+
   Future<void> assignTag() async {
     final source = selectedSource.value;
     if (source == null) {
@@ -165,19 +226,24 @@ class AssignMaterialTagController extends GetxController {
       return;
     }
 
+    final request = _buildRequest(source: source, material: material, tag: tag);
+
     isSubmitting.value = true;
     try {
-      final response = await materialRepository.insertMaterialTagging(
-        AddMaterialTaggingRequest(
-          inwardTypeId: source.id,
-          inwardId: material.id > 0 ? material.id : null,
-          materialId: material.materialId,
-          quantity: 1,
-          materialTagingDetails: [
-            AddMaterialTaggingDetails(tagCode: tag),
-          ],
-        ),
-      );
+      final online = await connectivityService.refresh();
+      if (online) {
+        await _assignOnline(request);
+      } else {
+        await _assignOffline(request);
+      }
+    } finally {
+      isSubmitting.value = false;
+    }
+  }
+
+  Future<void> _assignOnline(AddMaterialTaggingRequest request) async {
+    try {
+      final response = await materialRepository.insertMaterialTagging(request);
 
       if (response.succeeded) {
         Get.snackbar(
@@ -188,6 +254,7 @@ class AssignMaterialTagController extends GetxController {
           snackPosition: SnackPosition.BOTTOM,
         );
         _resetForm();
+        await syncService.syncPendingOperations();
       } else {
         Get.snackbar(
           AppStrings.assignFailed,
@@ -198,6 +265,10 @@ class AssignMaterialTagController extends GetxController {
         );
       }
     } on DioException catch (e) {
+      if (_isNetworkFailure(e)) {
+        await _assignOffline(request);
+        return;
+      }
       final data = e.response?.data;
       Get.snackbar(
         AppStrings.assignFailed,
@@ -212,9 +283,38 @@ class AssignMaterialTagController extends GetxController {
         AppStrings.unableToAssignMaterialTagRetry,
         snackPosition: SnackPosition.BOTTOM,
       );
-    } finally {
-      isSubmitting.value = false;
     }
+  }
+
+  Future<void> _assignOffline(AddMaterialTaggingRequest request) async {
+    final isDuplicate = await sqliteService.hasPendingAssignTag(request);
+    if (isDuplicate) {
+      Get.snackbar(
+        AppStrings.savedForSync,
+        AppStrings.materialAssignAlreadyPending,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      _resetForm();
+      return;
+    }
+
+    await sqliteService.insertPendingAssignTag(
+      PendingMaterialAssignTagModel(request: request),
+    );
+
+    Get.snackbar(
+      AppStrings.savedForSync,
+      AppStrings.materialAssignSavedOffline,
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 4),
+    );
+    _resetForm();
+  }
+
+  bool _isNetworkFailure(DioException e) {
+    return e.type == DioExceptionType.connectionError ||
+        e.type == DioExceptionType.connectionTimeout ||
+        e.type == DioExceptionType.unknown;
   }
 
   void _resetForm() {

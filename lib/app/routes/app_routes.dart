@@ -21,5 +21,6 @@ abstract class AppRoutes {
   static const searchTaggedEquipment = '/search-tagged-equipment';
   static const assignMaterialTag = '/assign-material-tag';
   static const unassignMaterialTag = '/unassign-material-tag';
+  static const assignMaterialLocationTag = '/assign-material-location-tag';
   static const materialSearch = '/material-search';
 }

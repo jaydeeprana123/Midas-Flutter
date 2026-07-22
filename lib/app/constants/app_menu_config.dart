@@ -137,6 +137,13 @@ class AppMenuConfig {
       section: AppMenuSection.materials,
       route: AppRoutes.unassignMaterialTag,
     ),
+    AppMenuItem(
+      permissionLabel: 'Link Material Location',
+      title: AppStrings.materialAssignLocationTag,
+      icon: Icons.map,
+      section: AppMenuSection.materials,
+      route: AppRoutes.assignMaterialLocationTag,
+    ),
   ];
 
   static List<AppMenuItem> visibleItems(

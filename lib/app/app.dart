@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:midas/Material/Widgets/material_sync_lifecycle_wrapper.dart';
 import 'package:midas/app/bindings/initial_binding.dart';
 import 'package:midas/app/routes/app_pages.dart';
 import 'package:midas/app/routes/app_routes.dart';
@@ -18,6 +19,11 @@ class App extends StatelessWidget {
       initialBinding: InitialBinding(),
       initialRoute: AppRoutes.splash,
       getPages: AppPages.pages,
+      builder: (context, child) {
+        return MaterialSyncLifecycleWrapper(
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
   }
 }
