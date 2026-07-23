@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:midas/Material/Controllers/assign_material_location_tag_controller.dart';
+import 'package:midas/Material/Models/material_inward_source.dart';
 import 'package:midas/Shared/Widgets/midas_toolbar_logo.dart';
 import 'package:midas/app/constants/app_strings.dart';
 import 'package:midas/app/theme/app_text_styles.dart';
@@ -41,44 +42,118 @@ class AssignMaterialLocationTagView
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            _LocationField(),
-                            const SizedBox(height: 16),
-                            _MaterialTagField(),
-                            const SizedBox(height: 22),
-                            Obx(() {
-                              if (controller.materialDetails.value != null) {
-                                return const SizedBox.shrink();
-                              }
-                              return ElevatedButton(
-                                onPressed: controller.isFetching.value
-                                    ? null
-                                    : controller.fetchDetails,
-                                child: controller.isFetching.value
-                                    ? const SizedBox(
-                                        height: 22,
-                                        width: 22,
-                                        child: CircularProgressIndicator(
-                                          color: Colors.white,
-                                          strokeWidth: 2.5,
+                            Obx(
+                              () => DropdownButtonFormField<MaterialInwardSource>(
+                                value: controller.selectedSource.value,
+                                decoration: const InputDecoration(
+                                  labelText: AppStrings.selectSource,
+                                  prefixIcon: Icon(Icons.inventory_2_outlined),
+                                ),
+                                hint: Text(
+                                  AppStrings.selectSource,
+                                  style:
+                                      AppTextStyles.body(color: Colors.black54),
+                                ),
+                                items: MaterialInwardSource.valuesInOrder
+                                    .map(
+                                      (source) => DropdownMenuItem(
+                                        value: source,
+                                        child: Text(
+                                          source.label,
+                                          style: AppTextStyles.body(
+                                            color: Colors.black87,
+                                          ),
                                         ),
-                                      )
-                                    : const Text(AppStrings.fetchDetails),
-                              );
-                            }),
+                                      ),
+                                    )
+                                    .toList(),
+                                onChanged: controller.isLoadingMaterials.value
+                                    ? null
+                                    : controller.onSourceChanged,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Obx(
+                              () => TextField(
+                                controller: controller.materialSearchController,
+                                readOnly: true,
+                                onTap: controller.openMaterialSearch,
+                                style:
+                                    AppTextStyles.body(color: Colors.black87),
+                                decoration: InputDecoration(
+                                  labelText: AppStrings.selectMaterial,
+                                  hintText: AppStrings.searchSelectMaterial,
+                                  prefixIcon: controller.isLoadingMaterials.value
+                                      ? const Padding(
+                                          padding: EdgeInsets.all(12),
+                                          child: SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2.5,
+                                            ),
+                                          ),
+                                        )
+                                      : const Icon(Icons.search),
+                                  suffixIcon: const Icon(Icons.arrow_drop_down),
+                                ),
+                              ),
+                            ),
                             Obx(() {
-                              final details = controller.materialDetails.value;
-                              if (details == null) {
+                              if (controller.selectedMaterials.isEmpty) {
                                 return const SizedBox.shrink();
                               }
                               return Padding(
-                                padding: const EdgeInsets.only(top: 8),
-                                child: _MaterialDetailsCard(
-                                  materialName: details.materialName,
-                                  materialCode: details.materialCode,
-                                  tagCode: details.tagCode,
+                                padding: const EdgeInsets.only(top: 12),
+                                child: Container(
+                                  constraints:
+                                      const BoxConstraints(maxHeight: 220),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: Colors.black12),
+                                  ),
+                                  child: ListView.separated(
+                                    shrinkWrap: true,
+                                    itemCount:
+                                        controller.selectedMaterials.length,
+                                    separatorBuilder: (_, _) =>
+                                        const Divider(height: 1),
+                                    itemBuilder: (context, index) {
+                                      final material =
+                                          controller.selectedMaterials[index];
+                                      return ListTile(
+                                        dense: true,
+                                        title: Text(
+                                          material.displayLabel,
+                                          style: AppTextStyles.body(
+                                            color: Colors.black87,
+                                            weight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        subtitle: material.listSubtitle.isEmpty
+                                            ? null
+                                            : Text(
+                                                material.listSubtitle,
+                                                style: AppTextStyles.body(
+                                                  color: Colors.black54,
+                                                ),
+                                              ),
+                                        trailing: IconButton(
+                                          onPressed: () => controller
+                                              .removeSelectedMaterial(material),
+                                          icon: const Icon(
+                                            Icons.close,
+                                            size: 20,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
                               );
                             }),
+                            const SizedBox(height: 16),
+                            _LocationField(),
                           ],
                         ),
                       ),
@@ -88,9 +163,9 @@ class AssignMaterialLocationTagView
               ),
             ),
             Obx(() {
-              if (controller.materialDetails.value == null) {
-                return const SizedBox.shrink();
-              }
+              final _ = controller.hasLocationCode.value;
+              final hasSelection = controller.selectedMaterials.isNotEmpty;
+              if (!hasSelection) return const SizedBox.shrink();
               return SafeArea(
                 top: false,
                 child: Padding(
@@ -98,9 +173,9 @@ class AssignMaterialLocationTagView
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: controller.isAssigning.value
-                          ? null
-                          : controller.assignLocationWithMaterial,
+                      onPressed: controller.canAssign
+                          ? controller.assignLocationWithMaterial
+                          : null,
                       child: controller.isAssigning.value
                           ? const SizedBox(
                               height: 22,
@@ -168,8 +243,7 @@ class _LocationField extends GetView<AssignMaterialLocationTagController> {
       controller: controller.locationController,
       focusNode: controller.locationFocusNode,
       autofocus: true,
-      textInputAction: TextInputAction.next,
-      onSubmitted: (_) => controller.materialTagFocusNode.requestFocus(),
+      textInputAction: TextInputAction.done,
       style: AppTextStyles.body(color: Colors.black87),
       decoration: InputDecoration(
         labelText: AppStrings.scanLocationQrHere,
@@ -192,110 +266,6 @@ class _LocationField extends GetView<AssignMaterialLocationTagController> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _MaterialTagField extends GetView<AssignMaterialLocationTagController> {
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: controller.materialTagController,
-      focusNode: controller.materialTagFocusNode,
-      textInputAction: TextInputAction.done,
-      style: AppTextStyles.body(color: Colors.black87),
-      decoration: InputDecoration(
-        labelText: AppStrings.scanMaterialTagQr,
-        prefixIcon: const Icon(Icons.qr_code_2),
-        suffixIcon: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Obx(
-              () => controller.isRfidConnected.value
-                  ? const Tooltip(
-                      message: AppStrings.rfidReaderConnected,
-                      child: Icon(Icons.sensors, color: AppTheme.primary),
-                    )
-                  : const SizedBox.shrink(),
-            ),
-            IconButton(
-              onPressed: controller.scanMaterialTagQr,
-              tooltip: AppStrings.scanQrBarcode,
-              icon: const Icon(Icons.qr_code_scanner, size: 28),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _MaterialDetailsCard extends StatelessWidget {
-  const _MaterialDetailsCard({
-    required this.materialName,
-    required this.materialCode,
-    required this.tagCode,
-  });
-
-  final String materialName;
-  final String materialCode;
-  final String tagCode;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppStrings.materialDetails,
-            style: AppTextStyles.body(
-              color: Colors.black87,
-              weight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 12),
-          _DetailRow(label: AppStrings.materialNameLabel, value: materialName),
-          const SizedBox(height: 8),
-          _DetailRow(label: AppStrings.materialCodeLabel, value: materialCode),
-          const SizedBox(height: 8),
-          _DetailRow(label: AppStrings.tagCodeLabel, value: tagCode),
-        ],
-      ),
-    );
-  }
-}
-
-class _DetailRow extends StatelessWidget {
-  const _DetailRow({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return RichText(
-      text: TextSpan(
-        children: [
-          TextSpan(
-            text: '$label : ',
-            style: AppTextStyles.body(
-              color: AppTheme.primary,
-              weight: FontWeight.w600,
-            ),
-          ),
-          TextSpan(
-            text: value.isEmpty ? AppStrings.emptyValue : value,
-            style: AppTextStyles.body(color: Colors.black87),
-          ),
-        ],
       ),
     );
   }

@@ -28,7 +28,8 @@ class HomeController extends GetxController {
   final drawerMenuItems = <AppMenuItem>[].obs;
 
   bool get showAssetsTab => assetMenuItems.isNotEmpty;
-  bool get showEquipmentsTab => equipmentMenuItems.isNotEmpty;
+  bool get showEquipmentsTab => false;
+  // bool get showEquipmentsTab => equipmentMenuItems.isNotEmpty;
   bool get showMaterialsTab => materialMenuItems.isNotEmpty;
 
   @override
@@ -66,15 +67,14 @@ class HomeController extends GetxController {
     final materialItems = AppMenuConfig.items
         .where((item) => item.section == AppMenuSection.materials)
         .toList();
-    materialMenuItems.assignAll(
-      materialItems.where((item) => item.showOnHome),
-    );
+    materialMenuItems.assignAll(materialItems.where((item) => item.showOnHome));
 
     drawerMenuItems.assignAll(
       AppMenuConfig.visibleItems(labels, drawerOnly: true),
     );
-    final existingLabels =
-        drawerMenuItems.map((item) => item.permissionLabel).toSet();
+    final existingLabels = drawerMenuItems
+        .map((item) => item.permissionLabel)
+        .toSet();
     for (final item in materialItems.where((item) => item.showInDrawer)) {
       if (!existingLabels.contains(item.permissionLabel)) {
         drawerMenuItems.add(item);

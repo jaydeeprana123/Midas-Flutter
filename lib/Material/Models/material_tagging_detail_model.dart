@@ -7,6 +7,7 @@ class MaterialTaggingDetailModel {
     this.materialTaggingId,
     this.materialId,
     this.location,
+    this.uom,
     this.rawJson,
   });
 
@@ -17,7 +18,26 @@ class MaterialTaggingDetailModel {
   final String materialName;
   final String materialCode;
   final String? location;
+  final String? uom;
   final String? rawJson;
+
+  /// e.g. `Stainless Steel Rod (SS001)`
+  String get displayLabel {
+    final name = materialName.trim();
+    final code = materialCode.trim();
+    if (name.isEmpty) return code;
+    if (code.isEmpty) return name;
+    return '$name ($code)';
+  }
+
+  /// Shown on the Search Material main field after selection.
+  String get trackingLabel {
+    final name = materialName.trim();
+    final tag = tagCode.trim();
+    if (name.isEmpty) return tag;
+    if (tag.isEmpty) return name;
+    return '$name ($tag)';
+  }
 
   String get displayLocation =>
       (location == null || location!.trim().isEmpty) ? '-' : location!.trim();
@@ -30,6 +50,7 @@ class MaterialTaggingDetailModel {
         'material_name': materialName,
         'material_code': materialCode,
         'location': location,
+        'uom': uom,
         'raw_json': rawJson,
         'updated_at': DateTime.now().toIso8601String(),
       };
@@ -43,6 +64,7 @@ class MaterialTaggingDetailModel {
       materialName: _str(row['material_name']),
       materialCode: _str(row['material_code']),
       location: _nullableStr(row['location']),
+      uom: _nullableStr(row['uom']),
       rawJson: _nullableStr(row['raw_json']),
     );
   }
@@ -55,9 +77,11 @@ class MaterialTaggingDetailModel {
     for (final item in list.whereType<Map>()) {
       final map = Map<String, dynamic>.from(item);
       final materialName = _str(map['materialName'] ?? map['MaterialName']);
-      final materialCode = _str(map['code'] ?? map['Code'] ?? map['materialCode']);
+      final materialCode =
+          _str(map['code'] ?? map['Code'] ?? map['materialCode']);
       final materialId = _toInt(map['materialId'] ?? map['MaterialId']);
       final taggingId = _toInt(map['id'] ?? map['Id']);
+      final uom = _nullableStr(map['uom'] ?? map['Uom'] ?? map['UOM']);
       final details = map['materialTagingDetails'] ??
           map['materialTaggingDetails'] ??
           map['MaterialTagingDetails'];
@@ -84,6 +108,7 @@ class MaterialTaggingDetailModel {
                   detailMap['location'] ??
                   detailMap['Location'],
             ),
+            uom: uom,
             rawJson: null,
           ),
         );

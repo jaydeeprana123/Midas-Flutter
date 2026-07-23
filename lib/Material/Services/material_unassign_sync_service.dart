@@ -44,6 +44,7 @@ class MaterialUnassignSyncService extends GetxService {
       await _syncPendingAssignTags();
       await _syncPendingUnassigns();
       await _syncPendingLinkLocations();
+      await _syncPendingGpsBatches();
     } finally {
       _syncInProgress = false;
       isSyncing.value = false;
@@ -146,6 +147,17 @@ class MaterialUnassignSyncService extends GetxService {
         );
       }
     }
+  }
+
+  /// Upload API for Search Material GPS is not available yet.
+  /// Pending batches remain in Sqflite until the API is wired.
+  Future<void> _syncPendingGpsBatches() async {
+    final pending = await sqliteService.getPendingGpsBatches();
+    if (pending.isEmpty) return;
+    AppLogger.info(
+      'Search Material GPS pending batches=${pending.length} '
+      '(upload API not available yet)',
+    );
   }
 
   @override

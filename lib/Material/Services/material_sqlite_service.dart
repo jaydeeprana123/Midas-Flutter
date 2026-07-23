@@ -2,6 +2,7 @@ import 'package:midas/Material/Models/add_material_tagging_request.dart';
 import 'package:midas/Material/Models/material_by_inward_type_model.dart';
 import 'package:midas/Material/Models/material_tagging_detail_model.dart';
 import 'package:midas/Material/Models/pending_material_assign_tag_model.dart';
+import 'package:midas/Material/Models/pending_material_gps_batch_model.dart';
 import 'package:midas/Material/Models/pending_material_link_location_model.dart';
 import 'package:midas/Material/Models/pending_material_unassign_model.dart';
 import 'package:path/path.dart' as p;
@@ -20,7 +21,7 @@ class MaterialSqliteService {
     final dbPath = await getDatabasesPath();
     return openDatabase(
       p.join(dbPath, 'midas_material.db'),
-      version: 3,
+      version: 6,
       onCreate: (db, version) async {
         await _createTables(db);
       },
@@ -63,6 +64,57 @@ class MaterialSqliteService {
             )
           ''');
         }
+        if (oldVersion < 4) {
+          try {
+            await db.execute(
+              'ALTER TABLE material_tag_details ADD COLUMN uom TEXT',
+            );
+          } catch (_) {}
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS pending_material_gps_batch (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              readings_json TEXT NOT NULL,
+              material_tag_code TEXT,
+              created_at TEXT,
+              status TEXT NOT NULL DEFAULT 'pending'
+            )
+          ''');
+        }
+        if (oldVersion < 5) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS material_pending_location (
+              inward_type_id INTEGER NOT NULL,
+              material_row_id INTEGER NOT NULL,
+              material_id INTEGER NOT NULL,
+              material_name TEXT,
+              code TEXT,
+              detail_id INTEGER,
+              tag_code TEXT,
+              uom TEXT,
+              PRIMARY KEY (inward_type_id, material_row_id, detail_id)
+            )
+          ''');
+        }
+        if (oldVersion < 6) {
+          // Dedicated cache for Assign Location Tag
+          // (GetAllMaterialByInwardTypeId?onlyTaggedPendingLocation=true).
+          // Separate from material_by_inward_type used by Assign Tag.
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS material_assign_location (
+              inward_type_id INTEGER NOT NULL,
+              material_row_id INTEGER NOT NULL,
+              material_id INTEGER NOT NULL,
+              material_name TEXT,
+              code TEXT,
+              uom TEXT,
+              uo_mid INTEGER,
+              quantity REAL,
+              tagged_quantity REAL,
+              remarks TEXT,
+              PRIMARY KEY (inward_type_id, material_row_id)
+            )
+          ''');
+        }
       },
     );
   }
@@ -77,6 +129,7 @@ class MaterialSqliteService {
             material_name TEXT,
             material_code TEXT,
             location TEXT,
+            uom TEXT,
             raw_json TEXT,
             updated_at TEXT
           )
@@ -124,7 +177,32 @@ class MaterialSqliteService {
             status TEXT NOT NULL DEFAULT 'pending'
           )
         ''');
+        await db.execute('''
+          CREATE TABLE pending_material_gps_batch (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            readings_json TEXT NOT NULL,
+            material_tag_code TEXT,
+            created_at TEXT,
+            status TEXT NOT NULL DEFAULT 'pending'
+          )
+        ''');
+        await db.execute('''
+          CREATE TABLE material_assign_location (
+            inward_type_id INTEGER NOT NULL,
+            material_row_id INTEGER NOT NULL,
+            material_id INTEGER NOT NULL,
+            material_name TEXT,
+            code TEXT,
+            uom TEXT,
+            uo_mid INTEGER,
+            quantity REAL,
+            tagged_quantity REAL,
+            remarks TEXT,
+            PRIMARY KEY (inward_type_id, material_row_id)
+          )
+        ''');
   }
+
 
   Future<void> upsertMaterialTagDetails(
     List<MaterialTaggingDetailModel> items,
@@ -154,6 +232,15 @@ class MaterialSqliteService {
     );
     if (rows.isEmpty) return null;
     return MaterialTaggingDetailModel.fromSqlite(rows.first);
+  }
+
+  Future<List<MaterialTaggingDetailModel>> getAllMaterialTagDetails() async {
+    final db = await database;
+    final rows = await db.query(
+      'material_tag_details',
+      orderBy: 'material_name COLLATE NOCASE ASC',
+    );
+    return rows.map(MaterialTaggingDetailModel.fromSqlite).toList();
   }
 
   Future<void> deleteMaterialTagDetailsByTagCode(String tagCode) async {
@@ -294,5 +381,67 @@ class MaterialSqliteService {
       where: 'id = ?',
       whereArgs: [id],
     );
+  }
+
+  Future<int> insertPendingGpsBatch(PendingMaterialGpsBatchModel record) async {
+    final db = await database;
+    return db.insert('pending_material_gps_batch', record.toSqliteMap());
+  }
+
+  Future<List<PendingMaterialGpsBatchModel>> getPendingGpsBatches() async {
+    final db = await database;
+    final rows = await db.query(
+      'pending_material_gps_batch',
+      where: 'status = ?',
+      whereArgs: ['pending'],
+      orderBy: 'id ASC',
+    );
+    return rows.map(PendingMaterialGpsBatchModel.fromSqlite).toList();
+  }
+
+  Future<void> markPendingGpsBatchSynced(int id) async {
+    final db = await database;
+    await db.delete(
+      'pending_material_gps_batch',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  /// Assign Location Tag cache:
+  /// `GetAllMaterialByInwardTypeId?onlyTaggedPendingLocation=true`
+  /// (separate from Assign Tag's `material_by_inward_type` table).
+  Future<void> replaceAssignLocationMaterials(
+    int inwardTypeId,
+    List<MaterialByInwardTypeModel> items,
+  ) async {
+    final db = await database;
+    final batch = db.batch();
+    batch.delete(
+      'material_assign_location',
+      where: 'inward_type_id = ?',
+      whereArgs: [inwardTypeId],
+    );
+    for (final item in items) {
+      batch.insert(
+        'material_assign_location',
+        item.toSqliteMap(inwardTypeId),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+    await batch.commit(noResult: true);
+  }
+
+  Future<List<MaterialByInwardTypeModel>> getAssignLocationMaterials(
+    int inwardTypeId,
+  ) async {
+    final db = await database;
+    final rows = await db.query(
+      'material_assign_location',
+      where: 'inward_type_id = ?',
+      whereArgs: [inwardTypeId],
+      orderBy: 'material_name COLLATE NOCASE ASC',
+    );
+    return rows.map(MaterialByInwardTypeModel.fromSqlite).toList();
   }
 }

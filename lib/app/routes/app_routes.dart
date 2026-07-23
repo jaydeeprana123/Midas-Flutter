@@ -23,4 +23,7 @@ abstract class AppRoutes {
   static const unassignMaterialTag = '/unassign-material-tag';
   static const assignMaterialLocationTag = '/assign-material-location-tag';
   static const materialSearch = '/material-search';
+  static const materialMultiSelectSearch = '/material-multi-select-search';
+  static const searchMaterial = '/search-material';
+  static const searchMaterialLookup = '/search-material-lookup';
 }

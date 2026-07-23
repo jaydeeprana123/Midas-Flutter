@@ -1,8 +1,10 @@
-import 'package:midas/AssetTag/Models/stock_in_response_model.dart';
-import 'package:midas/Material/Models/add_material_tagging_request.dart';
 import 'package:midas/Material/Models/material_by_inward_type_model.dart';
 import 'package:midas/Material/Models/material_tagging_detail_model.dart';
+import 'package:midas/Material/Models/tagged_material_item_model.dart';
 import 'package:midas/Shared/Services/api_client.dart';
+import 'package:midas/AssetTag/Models/stock_in_response_model.dart';
+import 'package:midas/Material/Models/add_material_tagging_request.dart';
+import 'package:midas/Shared/Services/app_logger.dart';
 
 class MaterialRepository {
   MaterialRepository(this._apiClient);
@@ -12,12 +14,31 @@ class MaterialRepository {
   /// Materials for a given inward/source type.
   /// `GET /api/MaterialTagging/GetAllMaterialByInwardTypeId/{Id}`
   Future<List<MaterialByInwardTypeModel>> getAllMaterialByInwardTypeId(
+    int inwardTypeId, {
+    bool? onlyTaggedPendingLocation,
+  }) async {
+    final json = onlyTaggedPendingLocation == null
+        ? await _apiClient.get(
+            '/api/MaterialTagging/GetAllMaterialByInwardTypeId/$inwardTypeId',
+          )
+        : await _apiClient.getWithQuery(
+            '/api/MaterialTagging/GetAllMaterialByInwardTypeId/$inwardTypeId',
+            queryParameters: {
+              'onlyTaggedPendingLocation': onlyTaggedPendingLocation,
+            },
+          );
+    return MaterialByInwardTypeModel.listFromResponse(json);
+  }
+
+  /// Tagged materials for an inward/source type.
+  /// `GET /api/MaterialTagging/GetAllTaggedMaterialByInwardTypeId/{Id}`
+  Future<List<TaggedMaterialItemModel>> getAllTaggedMaterialByInwardTypeId(
     int inwardTypeId,
   ) async {
     final json = await _apiClient.get(
-      '/api/MaterialTagging/GetAllMaterialByInwardTypeId/$inwardTypeId',
+      '/api/MaterialTagging/GetAllTaggedMaterialByInwardTypeId/$inwardTypeId',
     );
-    return MaterialByInwardTypeModel.listFromResponse(json);
+    return TaggedMaterialItemModel.listFromResponse(json);
   }
 
   /// Assigns a tag to a material.

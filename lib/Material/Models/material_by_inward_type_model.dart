@@ -32,6 +32,20 @@ class MaterialByInwardTypeModel {
     return '$name ($materialCode)';
   }
 
+  /// Unique key for multi-select identity.
+  String get selectionKey => 'm$materialId-$id';
+
+  String get listSubtitle {
+    final parts = <String>[];
+    if (uom != null && uom!.trim().isNotEmpty) {
+      parts.add(uom!.trim());
+    }
+    if (taggedQuantity > 0) {
+      parts.add('Tagged: ${taggedQuantity % 1 == 0 ? taggedQuantity.toInt() : taggedQuantity}');
+    }
+    return parts.join(' · ');
+  }
+
   factory MaterialByInwardTypeModel.fromJson(Map<String, dynamic> json) {
     return MaterialByInwardTypeModel(
       id: _toInt(json['id'] ?? json['Id']) ?? 0,

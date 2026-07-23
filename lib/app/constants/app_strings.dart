@@ -75,6 +75,7 @@ class AppStrings {
   static const materialAssignTag = 'Material Assign Tag';
   static const materialUnassignTag = 'Material Unassign Tag';
   static const materialAssignLocationTag = 'Assign Location Tag';
+  static const searchMaterial = 'Search Material';
 
   // Material assign tag
   static const selectSource = 'Select Source';
@@ -86,13 +87,13 @@ class AppStrings {
   static const sourceInwardQc = 'Inward QC';
   static const sourceJobWork = 'Job Work';
   static const sourceFinishGoods = 'Finish Goods';
+  static const sourceOpeningStock = 'Opening Stock';
   static const sourceIntermediate = 'Intermediate';
   static const sourceRequired = 'Source Required';
   static const selectSourceFirst = 'Please select a source first.';
   static const materialRequired = 'Material Required';
   static const selectMaterialFirst = 'Please select a material first.';
-  static const startTypingToSearchMaterial =
-      'Start typing to search materials';
+  static const startTypingToSearchMaterial = 'Start typing to search materials';
   static const noMaterialsFound = 'No Materials Found';
   static const noMaterialsForSelectedSource =
       'No materials found for the selected source.';
@@ -110,6 +111,17 @@ class AppStrings {
   static const materialAssignAlreadyPending =
       'This tag assignment is already saved and waiting to sync.';
   static const syncingInBackground = 'Syncing saved material data...';
+  static String materialsSelectedCount(int count) =>
+      '$count material${count == 1 ? '' : 's'} selected';
+  static const materialNameCodeOrTagCode = 'Material name/code or Tag code';
+  static const stopTrackingBeforeChangingMaterial =
+      'Please stop tracking before selecting another material.';
+  static const unableToStartMaterialTrackingRetry =
+      'Unable to start material tracking. Please try again.';
+  static const materialTrackingSavedOffline =
+      'No internet connection. Scanned tag data has been saved and will be synced automatically.';
+  static const materialTrackingSavedForFutureSync =
+      'Scanning stopped. Tag data has been saved locally and will be synced when the upload API is available.';
 
   // Material unassign tag
   static const unassignTag = 'Unassign Tag';
@@ -128,13 +140,14 @@ class AppStrings {
       'Unable to fetch material details. Please try again.';
   static const materialTagDetailsNotFound =
       'No material details found for this tag.';
+  static const selectedMaterialsMissingTagDetails =
+      'Selected material(s) are not tagged yet. Assign a material tag first, then assign location.';
   static const noOfflineMaterialDetails =
       'No internet connection and no saved material details for this tag.';
   static const unassignFailed = 'Unassign Failed';
   static const materialTagUnassignedSuccessfully =
       'Material tag unassigned successfully.';
-  static const unableToUnassignMaterialTag =
-      'Unable to unassign material tag.';
+  static const unableToUnassignMaterialTag = 'Unable to unassign material tag.';
   static const unableToUnassignMaterialTagRetry =
       'Unable to unassign material tag. Please try again.';
   static const savedForSync = 'Saved for Sync';
@@ -244,7 +257,8 @@ class AppStrings {
   static const noAssetsAtLocation = 'No assets found at this location.';
 
   // Change location by asset
-  static const scanAssetQrOrPressButton = 'Scan Asset QR or Press Button for RFID';
+  static const scanAssetQrOrPressButton =
+      'Scan Asset QR or Press Button for RFID';
   static const currentLocation = 'Current Location';
   static const update = 'Update';
   static const addAssetTagRequired = 'Asset Tag Required';
