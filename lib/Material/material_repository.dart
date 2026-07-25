@@ -30,6 +30,29 @@ class MaterialRepository {
     return MaterialByInwardTypeModel.listFromResponse(json);
   }
 
+
+  /// Materials for a given inward/source type.
+  /// `GET /api/MaterialTagging/GetAllMaterialByInwardTypeId/{Id}`
+  Future<List<MaterialByInwardTypeModel>> getAllTagMaterialByInwardTypeId(
+      int inwardTypeId, {
+        bool? onlyTaggedPendingLocation,
+      }) async {
+    final json = onlyTaggedPendingLocation == null
+        ? await _apiClient.get(
+      '/api/MaterialTagging/GetAllTaggedMaterialdataByMaterialId/$inwardTypeId',
+    )
+        : await _apiClient.getWithQuery(
+      '/api/MaterialTagging/GetAllTaggedMaterialdataByMaterialId/$inwardTypeId',
+      queryParameters: {
+        'onlyTaggedPendingLocation': onlyTaggedPendingLocation,
+      },
+    );
+    return MaterialByInwardTypeModel.listFromResponse(json);
+  }
+
+
+
+
   /// Tagged materials for an inward/source type.
   /// `GET /api/MaterialTagging/GetAllTaggedMaterialByInwardTypeId/{Id}`
   Future<List<TaggedMaterialItemModel>> getAllTaggedMaterialByInwardTypeId(
@@ -88,13 +111,14 @@ class MaterialRepository {
 
   /// Links material tag detail(s) to a location.
   /// `POST /api/MaterialTagging/LinkMaterialLocation?LocationCode=`
+  /// Body: `[tagCode, ...]` from selected materials' `materialTagingDetails`.
   Future<StockInResponseModel> linkMaterialLocation({
     required String locationCode,
-    required List<int> detailIds,
+    required List<String> tagCodes,
   }) async {
     final json = await _apiClient.postRaw(
       '/api/MaterialTagging/LinkMaterialLocation',
-      data: detailIds,
+      data: tagCodes,
       queryParameters: {'LocationCode': locationCode},
     );
     return StockInResponseModel.fromJson(json);

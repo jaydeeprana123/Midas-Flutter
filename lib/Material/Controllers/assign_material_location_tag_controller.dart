@@ -122,9 +122,9 @@ class AssignMaterialLocationTagController extends GetxController {
   /// GET GetAllMaterialByInwardTypeId/{Id}?onlyTaggedPendingLocation=true
   Future<void> _loadMaterialsOnline(int sourceId) async {
     try {
-      final materials = await materialRepository.getAllMaterialByInwardTypeId(
+      final materials = await materialRepository.getAllTagMaterialByInwardTypeId(
         sourceId,
-        onlyTaggedPendingLocation: true,
+        onlyTaggedPendingLocation: false,
       );
       availableMaterials.assignAll(materials);
       await sqliteService.replaceAssignLocationMaterials(sourceId, materials);
@@ -234,15 +234,13 @@ class AssignMaterialLocationTagController extends GetxController {
       return;
     }
 
-    // LinkMaterialLocation body: selected material row ids from
-    // GetAllMaterialByInwardTypeId?onlyTaggedPendingLocation=true
-    final materialIds = selectedMaterials
-        .map((item) => item.materialId)
-        .where((id) => id > 0)
+    // LinkMaterialLocation body: tag codes from selected materials.
+    final tagCodes = selectedMaterials
+        .expand((item) => item.tagCodes)
         .toSet()
         .toList();
 
-    if (materialIds.isEmpty) {
+    if (tagCodes.isEmpty) {
       Get.snackbar(
         AppStrings.assignFailed,
         AppStrings.unableToAssignMaterialLocation,
@@ -255,20 +253,23 @@ class AssignMaterialLocationTagController extends GetxController {
     try {
       final online = await connectivityService.refresh();
       if (online) {
-        await _assignOnline(locationCode, materialIds);
+        await _assignOnline(locationCode, tagCodes);
       } else {
-        await _assignOffline(locationCode, materialIds);
+        await _assignOffline(locationCode, tagCodes);
       }
     } finally {
       isAssigning.value = false;
     }
   }
 
-  Future<void> _assignOnline(String locationCode, List<int> materialIds) async {
+  Future<void> _assignOnline(
+    String locationCode,
+    List<String> tagCodes,
+  ) async {
     try {
       final response = await materialRepository.linkMaterialLocation(
         locationCode: locationCode,
-        detailIds: materialIds,
+        tagCodes: tagCodes,
       );
 
       if (response.succeeded) {
@@ -292,7 +293,7 @@ class AssignMaterialLocationTagController extends GetxController {
       }
     } on DioException catch (e) {
       if (_isNetworkFailure(e)) {
-        await _assignOffline(locationCode, materialIds);
+        await _assignOffline(locationCode, tagCodes);
         return;
       }
       final data = e.response?.data;
@@ -314,13 +315,13 @@ class AssignMaterialLocationTagController extends GetxController {
 
   Future<void> _assignOffline(
     String locationCode,
-    List<int> materialIds,
+    List<String> tagCodes,
   ) async {
     await sqliteService.insertPendingLinkLocation(
       PendingMaterialLinkLocationModel(
         locationCode: locationCode,
-        detailIds: materialIds,
-        tagCode: selectedMaterials.map((item) => item.code).join(','),
+        tagCodes: tagCodes,
+        tagCode: tagCodes.join(','),
       ),
     );
 

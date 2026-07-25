@@ -21,7 +21,7 @@ class MaterialSqliteService {
     final dbPath = await getDatabasesPath();
     return openDatabase(
       p.join(dbPath, 'midas_material.db'),
-      version: 6,
+      version: 7,
       onCreate: (db, version) async {
         await _createTables(db);
       },
@@ -115,6 +115,18 @@ class MaterialSqliteService {
             )
           ''');
         }
+        if (oldVersion < 7) {
+          for (final table in [
+            'material_assign_location',
+            'material_by_inward_type',
+          ]) {
+            try {
+              await db.execute(
+                'ALTER TABLE $table ADD COLUMN tagging_details_json TEXT',
+              );
+            } catch (_) {}
+          }
+        }
       },
     );
   }
@@ -165,6 +177,7 @@ class MaterialSqliteService {
             quantity REAL,
             tagged_quantity REAL,
             remarks TEXT,
+            tagging_details_json TEXT,
             PRIMARY KEY (inward_type_id, material_row_id)
           )
         ''');
@@ -198,6 +211,7 @@ class MaterialSqliteService {
             quantity REAL,
             tagged_quantity REAL,
             remarks TEXT,
+            tagging_details_json TEXT,
             PRIMARY KEY (inward_type_id, material_row_id)
           )
         ''');

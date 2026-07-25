@@ -120,7 +120,7 @@ class MaterialUnassignSyncService extends GetxService {
     for (final record in pending) {
       if (!connectivityService.isOnline.value) break;
       if (record.id == null ||
-          record.detailIds.isEmpty ||
+          record.tagCodes.isEmpty ||
           record.locationCode.isEmpty) {
         continue;
       }
@@ -128,7 +128,7 @@ class MaterialUnassignSyncService extends GetxService {
       try {
         final response = await materialRepository.linkMaterialLocation(
           locationCode: record.locationCode,
-          detailIds: record.detailIds,
+          tagCodes: record.tagCodes,
         );
         if (response.succeeded) {
           await sqliteService.markPendingLinkLocationSynced(record.id!);
