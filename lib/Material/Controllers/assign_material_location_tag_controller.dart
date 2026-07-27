@@ -67,7 +67,7 @@ class AssignMaterialLocationTagController extends GetxController {
   void onInit() {
     super.onInit();
     locationController.addListener(_onLocationChanged);
-    _initRfid();
+    // _initRfid();
   }
 
   @override
