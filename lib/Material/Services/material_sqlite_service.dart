@@ -21,7 +21,7 @@ class MaterialSqliteService {
     final dbPath = await getDatabasesPath();
     return openDatabase(
       p.join(dbPath, 'midas_material.db'),
-      version: 7,
+      version: 8,
       onCreate: (db, version) async {
         await _createTables(db);
       },
@@ -96,9 +96,6 @@ class MaterialSqliteService {
           ''');
         }
         if (oldVersion < 6) {
-          // Dedicated cache for Assign Location Tag
-          // (GetAllMaterialByInwardTypeId?onlyTaggedPendingLocation=true).
-          // Separate from material_by_inward_type used by Assign Tag.
           await db.execute('''
             CREATE TABLE IF NOT EXISTS material_assign_location (
               inward_type_id INTEGER NOT NULL,
@@ -126,6 +123,24 @@ class MaterialSqliteService {
               );
             } catch (_) {}
           }
+        }
+        if (oldVersion < 8) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS material_tagged_by_lookup_id (
+              lookup_id INTEGER NOT NULL,
+              material_row_id INTEGER NOT NULL,
+              material_id INTEGER NOT NULL,
+              material_name TEXT,
+              code TEXT,
+              uom TEXT,
+              uo_mid INTEGER,
+              quantity REAL,
+              tagged_quantity REAL,
+              remarks TEXT,
+              tagging_details_json TEXT,
+              PRIMARY KEY (lookup_id, material_row_id)
+            )
+          ''');
         }
       },
     );
@@ -213,6 +228,22 @@ class MaterialSqliteService {
             remarks TEXT,
             tagging_details_json TEXT,
             PRIMARY KEY (inward_type_id, material_row_id)
+          )
+        ''');
+        await db.execute('''
+          CREATE TABLE material_tagged_by_lookup_id (
+            lookup_id INTEGER NOT NULL,
+            material_row_id INTEGER NOT NULL,
+            material_id INTEGER NOT NULL,
+            material_name TEXT,
+            code TEXT,
+            uom TEXT,
+            uo_mid INTEGER,
+            quantity REAL,
+            tagged_quantity REAL,
+            remarks TEXT,
+            tagging_details_json TEXT,
+            PRIMARY KEY (lookup_id, material_row_id)
           )
         ''');
   }
@@ -457,5 +488,56 @@ class MaterialSqliteService {
       orderBy: 'material_name COLLATE NOCASE ASC',
     );
     return rows.map(MaterialByInwardTypeModel.fromSqlite).toList();
+  }
+
+  /// Cache for GetAllTaggedMaterialdataByMaterialId/{lookupId}.
+  Future<void> replaceTaggedMaterialsByLookupId(
+    int lookupId,
+    List<MaterialByInwardTypeModel> items,
+  ) async {
+    final db = await database;
+    final batch = db.batch();
+    batch.delete(
+      'material_tagged_by_lookup_id',
+      where: 'lookup_id = ?',
+      whereArgs: [lookupId],
+    );
+    for (final item in items) {
+      batch.insert(
+        'material_tagged_by_lookup_id',
+        {
+          'lookup_id': lookupId,
+          'material_row_id': item.id,
+          'material_id': item.materialId,
+          'material_name': item.materialName,
+          'code': item.code,
+          'uom': item.uom,
+          'uo_mid': item.uoMid,
+          'quantity': item.quantity,
+          'tagged_quantity': item.taggedQuantity,
+          'remarks': item.remarks,
+          'tagging_details_json': item.toSqliteMap(0)['tagging_details_json'],
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+    await batch.commit(noResult: true);
+  }
+
+  Future<List<MaterialByInwardTypeModel>> getTaggedMaterialsByLookupId(
+    int lookupId,
+  ) async {
+    final db = await database;
+    final rows = await db.query(
+      'material_tagged_by_lookup_id',
+      where: 'lookup_id = ?',
+      whereArgs: [lookupId],
+      orderBy: 'material_name COLLATE NOCASE ASC',
+    );
+    return rows.map((row) {
+      final adapted = Map<String, dynamic>.from(row);
+      adapted['inward_type_id'] = adapted['inward_type_id'] ?? 0;
+      return MaterialByInwardTypeModel.fromSqlite(adapted);
+    }).toList();
   }
 }

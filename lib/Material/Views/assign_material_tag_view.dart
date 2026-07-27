@@ -153,10 +153,7 @@ class _Header extends StatelessWidget {
             style: AppTextStyles.screenTitle(),
           ),
           const SizedBox(height: 12),
-          Text(
-            AppStrings.assignTag,
-            style: AppTextStyles.loginTitle(),
-          ),
+          Text(AppStrings.assignMaterialTag, style: AppTextStyles.loginTitle()),
         ],
       ),
     );

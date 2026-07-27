@@ -124,7 +124,8 @@ class AppStrings {
       'Scanning stopped. Tag data has been saved locally and will be synced when the upload API is available.';
 
   // Material unassign tag
-  static const unassignTag = 'Unassign Tag';
+  static const unassignTag = 'DeAssign Tag';
+  static const unassignMaterialTag = 'DeAssign Material Tag';
   static const scanQrHere = 'Scan QR Here';
   static const materialDetails = 'Material Details';
   static const materialNameLabel = 'Material Name';
@@ -138,6 +139,10 @@ class AppStrings {
       'Unable to fetch material details.';
   static const unableToFetchMaterialDetailsRetry =
       'Unable to fetch material details. Please try again.';
+  static const noTaggedMaterialsFoundForSelection =
+      'No tagged materials found for the selected material.';
+  static const noOfflineTaggedMaterialsForSelection =
+      'No internet connection and no saved tagged materials for this selection.';
   static const materialTagDetailsNotFound =
       'No material details found for this tag.';
   static const selectedMaterialsMissingTagDetails =
@@ -185,6 +190,7 @@ class AppStrings {
 
   // Assign asset tag
   static const assignTag = 'Assign Tag';
+  static const assignMaterialTag = 'Assign Material Tag';
   static const assignFailed = 'Assign Failed';
   static const tagAssignedSuccessfully = 'Tag assigned successfully.';
   static const unableToAssignTag = 'Unable to assign tag.';

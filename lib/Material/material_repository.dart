@@ -4,7 +4,6 @@ import 'package:midas/Material/Models/tagged_material_item_model.dart';
 import 'package:midas/Shared/Services/api_client.dart';
 import 'package:midas/AssetTag/Models/stock_in_response_model.dart';
 import 'package:midas/Material/Models/add_material_tagging_request.dart';
-import 'package:midas/Shared/Services/app_logger.dart';
 
 class MaterialRepository {
   MaterialRepository(this._apiClient);
@@ -30,28 +29,16 @@ class MaterialRepository {
     return MaterialByInwardTypeModel.listFromResponse(json);
   }
 
-
-  /// Materials for a given inward/source type.
-  /// `GET /api/MaterialTagging/GetAllMaterialByInwardTypeId/{Id}`
-  Future<List<MaterialByInwardTypeModel>> getAllTagMaterialByInwardTypeId(
-      int inwardTypeId, {
-        bool? onlyTaggedPendingLocation,
-      }) async {
-    final json = onlyTaggedPendingLocation == null
-        ? await _apiClient.get(
-      '/api/MaterialTagging/GetAllTaggedMaterialdataByMaterialId/$inwardTypeId',
-    )
-        : await _apiClient.getWithQuery(
-      '/api/MaterialTagging/GetAllTaggedMaterialdataByMaterialId/$inwardTypeId',
-      queryParameters: {
-        'onlyTaggedPendingLocation': onlyTaggedPendingLocation,
-      },
+  /// Tagged material rows by material id.
+  /// `GET /api/MaterialTagging/GetAllTaggedMaterialdataByMaterialId/{materialId}`
+  Future<List<MaterialByInwardTypeModel>> getAllTagMaterialByMaterialId(
+    int materialId,
+  ) async {
+    final json = await _apiClient.get(
+      '/api/MaterialTagging/GetAllTaggedMaterialdataByMaterialId/$materialId',
     );
     return MaterialByInwardTypeModel.listFromResponse(json);
   }
-
-
-
 
   /// Tagged materials for an inward/source type.
   /// `GET /api/MaterialTagging/GetAllTaggedMaterialByInwardTypeId/{Id}`

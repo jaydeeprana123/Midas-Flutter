@@ -73,8 +73,12 @@ class AssignMaterialLocationTagView
                               ),
                             ),
                             const SizedBox(height: 16),
-                            Obx(
-                              () => TextField(
+                            Obx(() {
+                              final loadingMaterials =
+                                  controller.isLoadingMaterials.value;
+                              final loadingTags =
+                                  controller.isLoadingTaggedMaterials.value;
+                              return TextField(
                                 controller: controller.materialSearchController,
                                 readOnly: true,
                                 onTap: controller.openMaterialSearch,
@@ -83,7 +87,7 @@ class AssignMaterialLocationTagView
                                 decoration: InputDecoration(
                                   labelText: AppStrings.selectMaterial,
                                   hintText: AppStrings.searchSelectMaterial,
-                                  prefixIcon: controller.isLoadingMaterials.value
+                                  prefixIcon: (loadingMaterials || loadingTags)
                                       ? const Padding(
                                           padding: EdgeInsets.all(12),
                                           child: SizedBox(
@@ -95,59 +99,33 @@ class AssignMaterialLocationTagView
                                           ),
                                         )
                                       : const Icon(Icons.search),
-                                  suffixIcon: const Icon(Icons.arrow_drop_down),
+                                  suffixIcon: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (controller.selectedMaterial.value !=
+                                          null)
+                                        IconButton(
+                                          onPressed:
+                                              controller.clearSelectedMaterial,
+                                          icon: const Icon(Icons.clear, size: 20),
+                                        ),
+                                      const Icon(Icons.arrow_drop_down),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ),
+                              );
+                            }),
                             Obx(() {
-                              if (controller.selectedMaterials.isEmpty) {
+                              final tags = controller.selectedTagCodes;
+                              if (tags.isEmpty) {
                                 return const SizedBox.shrink();
                               }
                               return Padding(
                                 padding: const EdgeInsets.only(top: 12),
-                                child: Container(
-                                  constraints:
-                                      const BoxConstraints(maxHeight: 220),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: Colors.black12),
-                                  ),
-                                  child: ListView.separated(
-                                    shrinkWrap: true,
-                                    itemCount:
-                                        controller.selectedMaterials.length,
-                                    separatorBuilder: (_, _) =>
-                                        const Divider(height: 1),
-                                    itemBuilder: (context, index) {
-                                      final material =
-                                          controller.selectedMaterials[index];
-                                      return ListTile(
-                                        dense: true,
-                                        title: Text(
-                                          material.displayLabel,
-                                          style: AppTextStyles.body(
-                                            color: Colors.black87,
-                                            weight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        subtitle: material.listSubtitle.isEmpty
-                                            ? null
-                                            : Text(
-                                                material.listSubtitle,
-                                                style: AppTextStyles.body(
-                                                  color: Colors.black54,
-                                                ),
-                                              ),
-                                        trailing: IconButton(
-                                          onPressed: () => controller
-                                              .removeSelectedMaterial(material),
-                                          icon: const Icon(
-                                            Icons.close,
-                                            size: 20,
-                                          ),
-                                        ),
-                                      );
-                                    },
+                                child: Text(
+                                  'Tags: ${tags.join(', ')}',
+                                  style: AppTextStyles.body(
+                                    color: Colors.black54,
                                   ),
                                 ),
                               );
@@ -163,8 +141,16 @@ class AssignMaterialLocationTagView
               ),
             ),
             Obx(() {
-              final _ = controller.hasLocationCode.value;
-              final hasSelection = controller.selectedMaterials.isNotEmpty;
+              final hasSelection = controller.selectedMaterial.value != null;
+              final hasLocation = controller.hasLocationCode.value;
+              final tagCount = controller.selectedTagCodes.length;
+              final loadingTags = controller.isLoadingTaggedMaterials.value;
+              final isAssigning = controller.isAssigning.value;
+              final canAssign = hasLocation &&
+                  hasSelection &&
+                  tagCount > 0 &&
+                  !loadingTags &&
+                  !isAssigning;
               if (!hasSelection) return const SizedBox.shrink();
               return SafeArea(
                 top: false,
@@ -173,10 +159,10 @@ class AssignMaterialLocationTagView
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: controller.canAssign
+                      onPressed: canAssign
                           ? controller.assignLocationWithMaterial
                           : null,
-                      child: controller.isAssigning.value
+                      child: isAssigning
                           ? const SizedBox(
                               height: 22,
                               width: 22,

@@ -20,6 +20,8 @@ class MaterialSearchController extends GetxController {
         args.whereType<MaterialByInwardTypeModel>(),
       );
     }
+    // Show full list initially for single-tap selection.
+    filteredMaterials.assignAll(allMaterials);
   }
 
   void onQueryChanged(String value) {
@@ -31,7 +33,7 @@ class MaterialSearchController extends GetxController {
     hasQuery.value = query.isNotEmpty;
 
     if (query.isEmpty) {
-      filteredMaterials.clear();
+      filteredMaterials.assignAll(allMaterials);
       return;
     }
 

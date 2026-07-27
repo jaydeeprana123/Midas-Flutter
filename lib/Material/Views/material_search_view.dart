@@ -74,19 +74,12 @@ class _ResultsList extends GetView<MaterialSearchController> {
         );
       }
 
-      if (!controller.hasQuery.value) {
-        return Center(
-          child: Text(
-            AppStrings.startTypingToSearchMaterial,
-            style: AppTextStyles.body(color: Colors.black54),
-          ),
-        );
-      }
-
       if (controller.filteredMaterials.isEmpty) {
         return Center(
           child: Text(
-            AppStrings.noResultsFound,
+            controller.hasQuery.value
+                ? AppStrings.noResultsFound
+                : AppStrings.noMaterialsFound,
             style: AppTextStyles.body(color: Colors.black54),
           ),
         );

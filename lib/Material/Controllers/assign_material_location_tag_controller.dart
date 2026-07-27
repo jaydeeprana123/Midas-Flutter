@@ -4,17 +4,16 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:midas/AssetTag/Views/qr_scanner_view.dart';
-import 'package:midas/Material/Controllers/material_multi_select_search_controller.dart';
 import 'package:midas/Material/Models/material_by_inward_type_model.dart';
 import 'package:midas/Material/Models/material_inward_source.dart';
 import 'package:midas/Material/Models/pending_material_link_location_model.dart';
 import 'package:midas/Material/Services/material_sqlite_service.dart';
 import 'package:midas/Material/Services/material_unassign_sync_service.dart';
 import 'package:midas/Material/Services/network_connectivity_service.dart';
-import 'package:midas/Material/Views/material_multi_select_search_view.dart';
 import 'package:midas/Material/material_repository.dart';
 import 'package:midas/Shared/Services/rfid_service.dart';
 import 'package:midas/app/constants/app_strings.dart';
+import 'package:midas/app/routes/app_routes.dart';
 
 class AssignMaterialLocationTagController extends GetxController {
   AssignMaterialLocationTagController({
@@ -37,18 +36,31 @@ class AssignMaterialLocationTagController extends GetxController {
 
   final selectedSource = Rxn<MaterialInwardSource>();
   final availableMaterials = <MaterialByInwardTypeModel>[].obs;
-  final selectedMaterials = <MaterialByInwardTypeModel>[].obs;
+  final selectedMaterial = Rxn<MaterialByInwardTypeModel>();
+
+  /// Response from GetAllTaggedMaterialdataByMaterialId for the selected material.
+  final taggedMaterials = <MaterialByInwardTypeModel>[].obs;
 
   final isLoadingMaterials = false.obs;
+  final isLoadingTaggedMaterials = false.obs;
   final isAssigning = false.obs;
   final isRfidConnected = false.obs;
   final hasLocationCode = false.obs;
 
   StreamSubscription<String>? _tagSubscription;
 
+  List<String> get selectedTagCodes => taggedMaterials
+      .expand((item) => item.tagCodes)
+      .map((tag) => tag.trim())
+      .where((tag) => tag.isNotEmpty)
+      .toSet()
+      .toList();
+
   bool get canAssign =>
       hasLocationCode.value &&
-      selectedMaterials.isNotEmpty &&
+      selectedMaterial.value != null &&
+      selectedTagCodes.isNotEmpty &&
+      !isLoadingTaggedMaterials.value &&
       !isAssigning.value;
 
   @override
@@ -99,7 +111,8 @@ class AssignMaterialLocationTagController extends GetxController {
 
   Future<void> onSourceChanged(MaterialInwardSource? source) async {
     selectedSource.value = source;
-    selectedMaterials.clear();
+    selectedMaterial.value = null;
+    taggedMaterials.clear();
     availableMaterials.clear();
     materialSearchController.clear();
 
@@ -118,13 +131,12 @@ class AssignMaterialLocationTagController extends GetxController {
     }
   }
 
-  /// Only API used on source select:
-  /// GET GetAllMaterialByInwardTypeId/{Id}?onlyTaggedPendingLocation=true
+  /// Source select API:
+  /// GET GetAllMaterialByInwardTypeId/{Id}
   Future<void> _loadMaterialsOnline(int sourceId) async {
     try {
-      final materials = await materialRepository.getAllTagMaterialByInwardTypeId(
+      final materials = await materialRepository.getAllMaterialByInwardTypeId(
         sourceId,
-        onlyTaggedPendingLocation: false,
       );
       availableMaterials.assignAll(materials);
       await sqliteService.replaceAssignLocationMaterials(sourceId, materials);
@@ -188,31 +200,108 @@ class AssignMaterialLocationTagController extends GetxController {
       return;
     }
 
-    final result = await Get.to<List<MaterialByInwardTypeModel>>(
-      () => const MaterialMultiSelectSearchView(),
-      binding: BindingsBuilder(() {
-        Get.lazyPut(() => MaterialMultiSelectSearchController());
-      }),
-      arguments: {
-        'materials': availableMaterials.toList(),
-        'selected': selectedMaterials.toList(),
-      },
+    final result = await Get.toNamed(
+      AppRoutes.materialSearch,
+      arguments: availableMaterials.toList(),
     );
 
-    if (result == null) return;
-    selectedMaterials.assignAll(result);
-    materialSearchController.text = result.isEmpty
-        ? ''
-        : AppStrings.materialsSelectedCount(result.length);
+    if (result is! MaterialByInwardTypeModel) return;
+
+    selectedMaterial.value = result;
+    materialSearchController.text = result.displayLabel;
+    taggedMaterials.clear();
+    await _loadTaggedMaterialsForSelection(result);
   }
 
-  void removeSelectedMaterial(MaterialByInwardTypeModel material) {
-    selectedMaterials.removeWhere(
-      (item) => item.selectionKey == material.selectionKey,
+  /// After single material selection:
+  /// GET GetAllTaggedMaterialdataByMaterialId/{id}
+  Future<void> _loadTaggedMaterialsForSelection(
+    MaterialByInwardTypeModel material,
+  ) async {
+    // Requirement: pass the selected material's `id` into the path.
+    final lookupId = material.materialId;
+    if (lookupId <= 0) {
+      Get.snackbar(
+        AppStrings.fetchFailed,
+        AppStrings.unableToFetchMaterialDetails,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    isLoadingTaggedMaterials.value = true;
+    try {
+      final online = await connectivityService.refresh();
+      if (online) {
+        await _loadTaggedMaterialsOnline(lookupId);
+      } else {
+        await _loadTaggedMaterialsOffline(lookupId);
+      }
+    } finally {
+      isLoadingTaggedMaterials.value = false;
+    }
+  }
+
+  Future<void> _loadTaggedMaterialsOnline(int lookupId) async {
+    try {
+      final result = await materialRepository.getAllTagMaterialByMaterialId(
+        lookupId,
+      );
+      taggedMaterials.assignAll(result);
+      await sqliteService.replaceTaggedMaterialsByLookupId(lookupId, result);
+
+      if (result.isEmpty || selectedTagCodes.isEmpty) {
+        Get.snackbar(
+          AppStrings.fetchFailed,
+          AppStrings.noTaggedMaterialsFoundForSelection,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } on DioException catch (e) {
+      final cached = await sqliteService.getTaggedMaterialsByLookupId(lookupId);
+      if (cached.isNotEmpty) {
+        taggedMaterials.assignAll(cached);
+        return;
+      }
+      final data = e.response?.data;
+      Get.snackbar(
+        AppStrings.fetchFailed,
+        data is Map && data['message'] != null
+            ? data['message'].toString()
+            : AppStrings.unableToFetchMaterialDetailsRetry,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } catch (_) {
+      final cached = await sqliteService.getTaggedMaterialsByLookupId(lookupId);
+      if (cached.isNotEmpty) {
+        taggedMaterials.assignAll(cached);
+        return;
+      }
+      Get.snackbar(
+        AppStrings.fetchFailed,
+        AppStrings.unableToFetchMaterialDetailsRetry,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  Future<void> _loadTaggedMaterialsOffline(int lookupId) async {
+    final cached = await sqliteService.getTaggedMaterialsByLookupId(lookupId);
+    if (cached.isNotEmpty) {
+      taggedMaterials.assignAll(cached);
+      return;
+    }
+    Get.snackbar(
+      AppStrings.fetchFailed,
+      AppStrings.noOfflineTaggedMaterialsForSelection,
+      snackPosition: SnackPosition.BOTTOM,
     );
-    materialSearchController.text = selectedMaterials.isEmpty
-        ? ''
-        : AppStrings.materialsSelectedCount(selectedMaterials.length);
+  }
+
+  void clearSelectedMaterial() {
+    selectedMaterial.value = null;
+    taggedMaterials.clear();
+    materialSearchController.clear();
   }
 
   Future<void> assignLocationWithMaterial() async {
@@ -225,7 +314,7 @@ class AssignMaterialLocationTagController extends GetxController {
       );
       return;
     }
-    if (selectedMaterials.isEmpty) {
+    if (selectedMaterial.value == null) {
       Get.snackbar(
         AppStrings.materialRequired,
         AppStrings.selectMaterialFirst,
@@ -234,16 +323,11 @@ class AssignMaterialLocationTagController extends GetxController {
       return;
     }
 
-    // LinkMaterialLocation body: tag codes from selected materials.
-    final tagCodes = selectedMaterials
-        .expand((item) => item.tagCodes)
-        .toSet()
-        .toList();
-
+    final tagCodes = selectedTagCodes;
     if (tagCodes.isEmpty) {
       Get.snackbar(
         AppStrings.assignFailed,
-        AppStrings.unableToAssignMaterialLocation,
+        AppStrings.noTaggedMaterialsFoundForSelection,
         snackPosition: SnackPosition.BOTTOM,
       );
       return;
@@ -262,10 +346,7 @@ class AssignMaterialLocationTagController extends GetxController {
     }
   }
 
-  Future<void> _assignOnline(
-    String locationCode,
-    List<String> tagCodes,
-  ) async {
+  Future<void> _assignOnline(String locationCode, List<String> tagCodes) async {
     try {
       final response = await materialRepository.linkMaterialLocation(
         locationCode: locationCode,
@@ -343,7 +424,8 @@ class AssignMaterialLocationTagController extends GetxController {
   void _resetForm() {
     selectedSource.value = null;
     availableMaterials.clear();
-    selectedMaterials.clear();
+    selectedMaterial.value = null;
+    taggedMaterials.clear();
     locationController.clear();
     materialSearchController.clear();
     hasLocationCode.value = false;

@@ -188,10 +188,8 @@ class AssignMaterialTagController extends GetxController {
       inwardTypeId: source.id,
       inwardId: material.id > 0 ? material.id : null,
       materialId: material.materialId,
-      quantity: 1,
-      materialTagingDetails: [
-        AddMaterialTaggingDetails(tagCode: tag),
-      ],
+      quantity: material.quantity - material.taggedQuantity,
+      materialTagingDetails: [AddMaterialTaggingDetails(tagCode: tag)],
     );
   }
 
