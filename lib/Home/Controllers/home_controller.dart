@@ -28,8 +28,7 @@ class HomeController extends GetxController {
   final drawerMenuItems = <AppMenuItem>[].obs;
 
   bool get showAssetsTab => assetMenuItems.isNotEmpty;
-  bool get showEquipmentsTab => false;
-  // bool get showEquipmentsTab => equipmentMenuItems.isNotEmpty;
+  bool get showEquipmentsTab => equipmentMenuItems.isNotEmpty;
   bool get showMaterialsTab => materialMenuItems.isNotEmpty;
 
   @override

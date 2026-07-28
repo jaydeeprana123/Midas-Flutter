@@ -137,6 +137,7 @@ class AssignMaterialLocationTagController extends GetxController {
     try {
       final materials = await materialRepository.getAllMaterialByInwardTypeId(
         sourceId,
+        onlyTaggedPendingLocation: true,
       );
       availableMaterials.assignAll(materials);
       await sqliteService.replaceAssignLocationMaterials(sourceId, materials);
