@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:midas/Material/Models/add_material_tagging_request.dart';
 import 'package:midas/Material/Models/material_by_inward_type_model.dart';
 import 'package:midas/Material/Models/material_tagging_detail_model.dart';
@@ -18,9 +19,11 @@ class MaterialSqliteService {
   }
 
   Future<Database> _open() async {
-    final dbPath = await getDatabasesPath();
+    final path = kIsWeb
+        ? 'midas_material.db'
+        : p.join(await getDatabasesPath(), 'midas_material.db');
     return openDatabase(
-      p.join(dbPath, 'midas_material.db'),
+      path,
       version: 8,
       onCreate: (db, version) async {
         await _createTables(db);
