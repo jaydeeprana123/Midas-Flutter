@@ -144,13 +144,13 @@ class AppMenuConfig {
       section: AppMenuSection.materials,
       route: AppRoutes.assignMaterialLocationTag,
     ),
-    // AppMenuItem(
-    //   permissionLabel: 'Search Material',
-    //   title: AppStrings.searchMaterial,
-    //   icon: Icons.add_location,
-    //   section: AppMenuSection.materials,
-    //   route: AppRoutes.searchMaterial,
-    // ),
+    AppMenuItem(
+      permissionLabel: 'Search Material',
+      title: AppStrings.searchMaterial,
+      icon: Icons.add_location,
+      section: AppMenuSection.materials,
+      route: AppRoutes.searchMaterial,
+    ),
   ];
 
   static List<AppMenuItem> visibleItems(

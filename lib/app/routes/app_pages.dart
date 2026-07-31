@@ -385,8 +385,6 @@ class AppPages {
         Get.lazyPut(
           () => SearchMaterialLookupController(
             materialRepository: Get.find<MaterialRepository>(),
-            sqliteService: Get.find<MaterialSqliteService>(),
-            connectivityService: Get.find<NetworkConnectivityService>(),
           ),
         );
       }),

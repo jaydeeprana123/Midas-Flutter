@@ -8,6 +8,7 @@ class MaterialTaggingDetailModel {
     this.materialId,
     this.location,
     this.uom,
+    this.rfid,
     this.rawJson,
   });
 
@@ -19,6 +20,7 @@ class MaterialTaggingDetailModel {
   final String materialCode;
   final String? location;
   final String? uom;
+  final String? rfid;
   final String? rawJson;
 
   /// e.g. `Stainless Steel Rod (SS001)`
@@ -65,8 +67,48 @@ class MaterialTaggingDetailModel {
       materialCode: _str(row['material_code']),
       location: _nullableStr(row['location']),
       uom: _nullableStr(row['uom']),
+      rfid: _nullableStr(row['rfid']),
       rawJson: _nullableStr(row['raw_json']),
     );
+  }
+
+  /// Parses `GET /api/MaterialTagging/SearchMaterialForMobileApp` flat rows.
+  static List<MaterialTaggingDetailModel> listFromMobileSearchResponse(
+    dynamic response,
+  ) {
+    final list = _extractList(response);
+    final results = <MaterialTaggingDetailModel>[];
+
+    for (final item in list.whereType<Map>()) {
+      final map = Map<String, dynamic>.from(item);
+      final materialName =
+          _str(map['name'] ?? map['Name'] ?? map['materialName']);
+      final materialCode =
+          _str(map['code'] ?? map['Code'] ?? map['materialCode']);
+      final tagCode = _str(map['tagCode'] ?? map['TagCode']);
+      if (materialName.isEmpty && materialCode.isEmpty && tagCode.isEmpty) {
+        continue;
+      }
+
+      results.add(
+        MaterialTaggingDetailModel(
+          detailId: 0,
+          materialId: _toInt(map['materialId'] ?? map['MaterialId']),
+          tagCode: tagCode,
+          materialName: materialName,
+          materialCode: materialCode,
+          location: _nullableStr(
+            map['locationCode'] ??
+                map['LocationCode'] ??
+                map['location'] ??
+                map['Location'],
+          ),
+          rfid: _nullableStr(map['rfid'] ?? map['Rfid'] ?? map['RFID']),
+        ),
+      );
+    }
+
+    return results;
   }
 
   /// Flattens GetMaterialTaggingDetails response into one row per tag detail.

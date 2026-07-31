@@ -84,6 +84,18 @@ class MaterialRepository {
     );
   }
 
+  /// Searches materials for the mobile Search Material flow.
+  /// `GET /api/MaterialTagging/SearchMaterialForMobileApp?materialName=`
+  Future<List<MaterialTaggingDetailModel>> searchMaterialForMobileApp(
+    String materialName,
+  ) async {
+    final json = await _apiClient.getWithQuery(
+      '/api/MaterialTagging/SearchMaterialForMobileApp',
+      queryParameters: {'materialName': materialName},
+    );
+    return MaterialTaggingDetailModel.listFromMobileSearchResponse(json);
+  }
+
   /// Unassigns material tag(s) by detail id(s).
   /// `POST /api/MaterialTagging/DeLinkMaterialTag` body: `[detailId, ...]`
   Future<StockInResponseModel> deLinkMaterialTag({

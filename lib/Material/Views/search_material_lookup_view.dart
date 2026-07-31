@@ -68,12 +68,12 @@ class _ResultsList extends GetView<SearchMaterialLookupController> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      if (controller.isLoading.value && controller.allMaterials.isEmpty) {
+      if (controller.isLoading.value && controller.results.isEmpty) {
         return const Center(child: CircularProgressIndicator());
       }
 
       if (controller.errorMessage.value.isNotEmpty &&
-          controller.allMaterials.isEmpty) {
+          controller.results.isEmpty) {
         return Center(
           child: Text(
             controller.errorMessage.value,
@@ -92,7 +92,7 @@ class _ResultsList extends GetView<SearchMaterialLookupController> {
         );
       }
 
-      if (controller.filteredMaterials.isEmpty) {
+      if (controller.results.isEmpty) {
         return Center(
           child: Text(
             AppStrings.noResultsFound,
@@ -102,10 +102,11 @@ class _ResultsList extends GetView<SearchMaterialLookupController> {
       }
 
       return ListView.separated(
-        itemCount: controller.filteredMaterials.length,
+        itemCount: controller.results.length,
         separatorBuilder: (_, _) => const Divider(height: 1),
         itemBuilder: (context, index) {
-          final material = controller.filteredMaterials[index];
+          final material = controller.results[index];
+          final tagCode = material.tagCode.trim();
           return ListTile(
             title: Text(
               material.displayLabel,
@@ -114,10 +115,10 @@ class _ResultsList extends GetView<SearchMaterialLookupController> {
                 weight: FontWeight.w600,
               ),
             ),
-            subtitle: material.uom == null || material.uom!.isEmpty
+            subtitle: tagCode.isEmpty
                 ? null
                 : Text(
-                    material.uom!,
+                    tagCode,
                     style: AppTextStyles.body(color: Colors.black54),
                   ),
             contentPadding:
