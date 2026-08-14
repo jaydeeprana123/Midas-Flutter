@@ -45,6 +45,8 @@ dependencies:
   sqflite_common_ffi_web: ^1.1.1
   path: ^1.9.1
   connectivity_plus: ^6.1.4
+  android_id: ^0.5.2+1
+  uuid: ^4.6.0
 
 dev_dependencies:
   flutter_test:
@@ -60,6 +62,11 @@ flutter_launcher_icons:
   ios: true
   image_path: assets/images/splash_logo.png
   remove_alpha_ios: true
+  web:
+    generate: true
+    image_path: assets/images/splash_logo.png
+    background_color: "#2B0A76"
+    theme_color: "#4A23A8"
 
 flutter_native_splash:
   color: "#2B0A76"
