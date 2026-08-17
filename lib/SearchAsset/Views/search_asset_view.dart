@@ -128,7 +128,9 @@ class _StartStopButtons extends GetView<SearchAssetController> {
               onPressed: controller.canStart ? controller.start : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primary,
-                disabledBackgroundColor: const Color(0xFFBDBDBD),
+                disabledBackgroundColor: controller.isStarting.value
+                    ? AppTheme.primary
+                    : const Color(0xFFBDBDBD),
               ),
               child: controller.isStarting.value
                   ? const SizedBox(

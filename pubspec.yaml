@@ -47,6 +47,7 @@ dependencies:
   connectivity_plus: ^6.1.4
   android_id: ^0.5.2+1
   uuid: ^4.6.0
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:

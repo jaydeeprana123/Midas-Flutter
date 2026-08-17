@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:midas/Auth/Controllers/login_controller.dart';
 import 'package:midas/Auth/Views/domain_selection_dialog.dart';
 import 'package:midas/Shared/Widgets/midas_toolbar_logo.dart';
+import 'package:midas/Shared/Widgets/powered_by_logo.dart';
 import 'package:midas/app/constants/app_strings.dart';
 import 'package:midas/app/theme/app_text_styles.dart';
 import 'package:midas/app/theme/app_theme.dart';
@@ -82,8 +83,13 @@ class LoginView extends GetView<LoginController> {
                               ? null
                               : controller.onLogin,
                           child: controller.isLoading.value
-                              ? const CircularProgressIndicator(
-                                  color: Colors.white,
+                              ? const SizedBox(
+                                  height: 22,
+                                  width: 22,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2.5,
+                                  ),
                                 )
                               : const Text(AppStrings.login),
                         ),
@@ -105,7 +111,7 @@ class LoginView extends GetView<LoginController> {
                         AppStrings.version(controller.version.value),
                         style: AppTextStyles.footer(),
                       ),
-                      Text(AppStrings.poweredByG, style: AppTextStyles.footerBrand()),
+                      const PoweredByLogo(),
                     ],
                   ),
                 ),

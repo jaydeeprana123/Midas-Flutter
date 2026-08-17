@@ -162,6 +162,12 @@ class AssignMaterialLocationTagView
                       onPressed: canAssign
                           ? controller.assignLocationWithMaterial
                           : null,
+                      style: ElevatedButton.styleFrom(
+                        disabledBackgroundColor: isAssigning
+                            ? AppTheme.primary
+                            : const Color(0xFFBDBDBD),
+                        disabledForegroundColor: Colors.white,
+                      ),
                       child: isAssigning
                           ? const SizedBox(
                               height: 22,

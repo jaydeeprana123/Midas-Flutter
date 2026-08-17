@@ -67,9 +67,9 @@ class LoginController extends GetxController {
   Future<void> onReady() async {
     super.onReady();
 
-    macAddress.value = "f907f6a426868d43";
+    // macAddress.value = "f907f6a426868d43";
 
-    //  macAddress.value = await deviceService.getMacOrDeviceId();
+    macAddress.value = await deviceService.getMacOrDeviceId();
   }
 
   Future<void> onLogin() async {

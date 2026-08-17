@@ -8,6 +8,7 @@ class IdentityAssetModel {
     this.tagCode = '',
     this.locationCode = '',
     this.remarks = '',
+    this.isTaggable = '',
     this.path,
   });
 
@@ -17,6 +18,7 @@ class IdentityAssetModel {
   final String tagCode;
   final String locationCode;
   final String remarks;
+  final String isTaggable;
   final LocationPathModel? path;
 
   bool get hasLocationPath =>
@@ -31,10 +33,7 @@ class IdentityAssetModel {
         json['assetName'] ?? json['AssetName'] ?? json['name'] ?? json['Name'],
       ),
       assetCode: _toStr(
-        json['assetCode'] ??
-            json['AssetCode'] ??
-            json['code'] ??
-            json['Code'],
+        json['assetCode'] ?? json['AssetCode'] ?? json['code'] ?? json['Code'],
       ),
       serialNo: _toStr(
         json['serialNo'] ??
@@ -47,6 +46,7 @@ class IdentityAssetModel {
       tagCode: _toStr(json['tagCode'] ?? json['TagCode']),
       locationCode: _toStr(json['locationCode'] ?? json['LocationCode']),
       remarks: _toStr(json['remarks'] ?? json['Remarks']),
+      isTaggable: _toStr(json['isTaggable'] ?? json['IsTaggable']),
       path: pathJson is Map
           ? LocationPathModel.fromJson(Map<String, dynamic>.from(pathJson))
           : null,

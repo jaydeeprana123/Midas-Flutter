@@ -26,6 +26,8 @@ class AppStrings {
   static const location = 'Location';
   static const scanAssetQr = 'Scan Asset QR';
   static const scanQrOrPressButton = 'Scan QR or Press Button for RFID';
+  static const scanQrOrPressButtonOrAssetCode =
+      'Scan QR or Press Button for RFID or Asset Code';
   static const scanLocationQrHere = 'Scan Location QR Here';
   static const assetNameOrCode = 'Asset name or Asset code';
   static const assetSerialNumber = 'Asset Serial Number';
@@ -42,7 +44,8 @@ class AppStrings {
   // Login
   static const userName = 'User Name';
   static const password = 'Password';
-  static const poweredByG = 'Powered By G';
+  static const poweredBy = 'Powered By';
+  static const poweredByUrl = 'https://garimasystem.com/';
   static const loginFailed = 'Login Failed';
   static const authTokenNotReceived = 'Authentication token not received.';
   static const invalidUsernameOrPassword = 'Invalid username or password.';
@@ -239,6 +242,7 @@ class AppStrings {
   static const shift = 'Shift';
   static const transit = 'Transit';
   static const remarks = 'Remarks';
+  static const isTaggable = 'Is Taggable';
   static const selectRemarks = 'Select Remarks';
   static const assetNameOrTagCode = 'Asset name or Tag code';
   static const assetsDetails = 'Assets Details :';
