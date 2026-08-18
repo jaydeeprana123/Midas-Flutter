@@ -54,12 +54,14 @@ class LoginController extends GetxController {
     if (savedUsername != null && savedUsername.isNotEmpty) {
       usernameController.text = savedUsername;
     } else {
-      usernameController.text = 'gsspl';
+      usernameController.text = '';
+      // usernameController.text = 'gsspl';
     }
     if (savedPassword != null && savedPassword.isNotEmpty) {
       passwordController.text = savedPassword;
     } else {
-      passwordController.text = 'Admin\$1234';
+      passwordController.text = '';
+      // passwordController.text = 'Admin\$1234';
     }
   }
 

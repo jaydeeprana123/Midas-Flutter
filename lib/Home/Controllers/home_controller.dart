@@ -61,24 +61,17 @@ class HomeController extends GetxController {
         homeOnly: true,
       ),
     );
-
-    // Always show Material tab/items for all users (permission check skipped).
-    final materialItems = AppMenuConfig.items
-        .where((item) => item.section == AppMenuSection.materials)
-        .toList();
-    materialMenuItems.assignAll(materialItems.where((item) => item.showOnHome));
+    materialMenuItems.assignAll(
+      AppMenuConfig.visibleItems(
+        labels,
+        section: AppMenuSection.materials,
+        homeOnly: true,
+      ),
+    );
 
     drawerMenuItems.assignAll(
       AppMenuConfig.visibleItems(labels, drawerOnly: true),
     );
-    final existingLabels = drawerMenuItems
-        .map((item) => item.permissionLabel)
-        .toSet();
-    for (final item in materialItems.where((item) => item.showInDrawer)) {
-      if (!existingLabels.contains(item.permissionLabel)) {
-        drawerMenuItems.add(item);
-      }
-    }
 
     if (showAssetsTab) {
       selectedTab.value = 0;
