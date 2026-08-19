@@ -50,10 +50,13 @@ import 'package:midas/Material/material_repository.dart';
 import 'package:midas/Location/Controllers/assign_location_tag_controller.dart';
 import 'package:midas/Location/Controllers/change_location_by_asset_controller.dart';
 import 'package:midas/Location/Controllers/change_location_by_location_controller.dart';
+import 'package:midas/Location/Controllers/change_location_by_material_controller.dart';
 import 'package:midas/Location/Views/assign_location_tag_view.dart';
 import 'package:midas/Location/Views/change_location_by_asset_view.dart';
 import 'package:midas/Location/Views/change_location_by_location_view.dart';
+import 'package:midas/Location/Views/change_location_by_material_view.dart';
 import 'package:midas/Location/Views/scan_asset_qr_change_location_view.dart';
+import 'package:midas/Location/Views/scan_material_qr_change_location_view.dart';
 import 'package:midas/Location/location_repository.dart';
 import 'package:midas/Auth/Controllers/login_controller.dart';
 import 'package:midas/Auth/Controllers/splash_controller.dart';
@@ -181,6 +184,23 @@ class AppPages {
     GetPage(
       name: AppRoutes.scanAssetForChangeLocation,
       page: () => const ScanAssetQrChangeLocationView(),
+    ),
+    GetPage(
+      name: AppRoutes.changeLocationByMaterial,
+      page: () => const ChangeLocationByMaterialView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => ChangeLocationByMaterialController(
+            locationRepository: Get.find<LocationRepository>(),
+            materialRepository: Get.find<MaterialRepository>(),
+            rfidService: Get.find<RfidService>(),
+          ),
+        );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.scanMaterialForChangeLocation,
+      page: () => const ScanMaterialQrChangeLocationView(),
     ),
     GetPage(
       name: AppRoutes.identifyAsset,

@@ -13,6 +13,7 @@ class AppStrings {
   static const cancel = 'Cancel';
   static const save = 'Save';
   static const submit = 'Submit';
+  static const remove = 'Remove';
   static const success = 'Success';
   static const ok = 'OK';
 
@@ -68,6 +69,7 @@ class AppStrings {
   static const assignLocationTag = 'Assign Location Tag';
   static const changeLocationByLocation = 'Change Location By Location';
   static const changeLocationByAsset = 'Change Location By Asset';
+  static const changeLocationByMaterial = 'Change Location By Material';
   static const identifyAsset = 'Identify Asset';
   static const searchAsset = 'Search Asset';
   static const auditAssets = 'Audit Assets';
@@ -280,6 +282,15 @@ class AppStrings {
   static const identifiedAssetsRequired = 'Identified Assets Required';
   static const identifyAssetsBeforeUpdate =
       'Please identify assets before updating location.';
+
+  // Change location by material
+  static const scanMaterialQr = 'Scan Material QR';
+  static const removeMaterial = 'Remove material';
+  static const selectedMaterialsRequired = 'Materials Required';
+  static const selectMaterialsBeforeUpdate =
+      'Please select materials before updating location.';
+  static String selectedMaterialsCountLabel(int count) =>
+      'Selected Materials: $count';
 
   // Link equipment tag
   static const equipmentNameOrCode = 'Equipment name or code';

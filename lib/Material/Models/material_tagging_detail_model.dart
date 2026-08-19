@@ -23,6 +23,13 @@ class MaterialTaggingDetailModel {
   final String? rfid;
   final String? rawJson;
 
+  /// Stable id for checkbox selection across changing search results.
+  String get selectionKey {
+    final tag = tagCode.trim();
+    if (tag.isNotEmpty) return 'tag:$tag';
+    return 'mat:${materialId ?? 0}|${materialCode.trim()}|${materialName.trim()}';
+  }
+
   /// e.g. `Stainless Steel Rod (SS001)`
   String get displayLabel {
     final name = materialName.trim();
