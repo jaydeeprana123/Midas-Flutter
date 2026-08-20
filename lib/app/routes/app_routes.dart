@@ -29,4 +29,5 @@ abstract class AppRoutes {
   static const materialMultiSelectSearch = '/material-multi-select-search';
   static const searchMaterial = '/search-material';
   static const searchMaterialLookup = '/search-material-lookup';
+  static const materialIssueNote = '/material-issue-note';
 }

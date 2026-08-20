@@ -81,6 +81,7 @@ class AppStrings {
   static const materialUnassignTag = 'Material Unassign Tag';
   static const materialAssignLocationTag = 'Assign Location Tag';
   static const searchMaterial = 'Search Material';
+  static const materialIssueNote = 'Material Issue Note';
 
   // Material assign tag
   static const selectSource = 'Select Source';
@@ -398,4 +399,55 @@ class AppStrings {
 
   static String cameraError(String errorCode) =>
       '$unableToStartCamera\n$errorCode';
+
+  // Material issue note
+  static const issueNoteNo = 'Issue Note No.';
+  static const issueNoteDate = 'Issue Note Date';
+  static const indentTypeRequiredLabel = 'Indent Type *';
+  static const indentNoRequiredLabel = 'Indent No. *';
+  static const selectIndentType = 'Select Indent Type';
+  static const selectIndentNo = 'Select Indent No.';
+  static const department = 'Department';
+  static const enterRemarks = 'Enter Remarks';
+  static const materialIssueNoteDetails = 'Material Issue Note Details';
+  static const selectIndentToLoadMaterials =
+      'Select an indent number to load material details.';
+  static const materialLabel = 'Material';
+  static const codeLabel = 'Code';
+  static const uomLabel = 'UOM';
+  static const indentUomLabel = 'Indent UOM';
+  static const availableStockLabel = 'Available Stock';
+  static const indentQtyLabel = 'Indent Qty';
+  static const issuedQtyLabel = 'Issued Qty *';
+  static const remainingQtyLabel = 'Remaining Qty';
+  static const finalStockLabel = 'Final Stock';
+  static const descriptionLabel = 'Description';
+  static const enterDescription = 'Enter description';
+  static const issueNoteNoRequired = 'Issue Note No. Required';
+  static const indentTypeRequired = 'Indent Type Required';
+  static const selectIndentTypeFirst = 'Please select an indent type.';
+  static const indentNoRequired = 'Indent No. Required';
+  static const selectIndentNoFirst = 'Please select an indent number.';
+  static const noIndentNosFound = 'No Indent Numbers';
+  static const noIndentNosForSelectedType =
+      'No indent numbers found for the selected indent type.';
+  static const noMaterialsForSelectedIndent =
+      'No materials found for the selected indent.';
+  static const invalidIssuedQty = 'Invalid Issued Qty';
+  static const issuedQtyValidationMessage =
+      'Issued quantity cannot be greater than available stock or indent quantity.';
+  static const unableToGenerateIssueNoteNo =
+      'Unable to generate issue note number. Please try again.';
+  static const unableToFetchIndentTypes =
+      'Unable to fetch indent types. Please try again.';
+  static const unableToFetchIndentNos =
+      'Unable to fetch indent numbers. Please try again.';
+  static const unableToFetchMaterialIndent =
+      'Unable to fetch material indent details. Please try again.';
+  static const materialIssueNoteSaved =
+      'Material issue note submitted successfully.';
+  static const unableToSubmitMaterialIssueNote =
+      'Unable to submit material issue note.';
+  static const unableToSubmitMaterialIssueNoteRetry =
+      'Unable to submit material issue note. Please try again.';
 }

@@ -158,6 +158,13 @@ class AppMenuConfig {
       section: AppMenuSection.materials,
       route: AppRoutes.searchMaterial,
     ),
+    AppMenuItem(
+      permissionLabel: 'Material Issue',
+      title: AppStrings.materialIssueNote,
+      icon: Icons.assignment_outlined,
+      section: AppMenuSection.materials,
+      route: AppRoutes.materialIssueNote,
+    ),
   ];
 
   static List<AppMenuItem> visibleItems(

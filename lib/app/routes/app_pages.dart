@@ -47,6 +47,9 @@ import 'package:midas/Material/Services/material_sqlite_service.dart';
 import 'package:midas/Material/Services/material_unassign_sync_service.dart';
 import 'package:midas/Material/Services/network_connectivity_service.dart';
 import 'package:midas/Material/material_repository.dart';
+import 'package:midas/MaterialIssueNote/Controllers/material_issue_note_controller.dart';
+import 'package:midas/MaterialIssueNote/Views/material_issue_note_view.dart';
+import 'package:midas/MaterialIssueNote/material_issue_note_repository.dart';
 import 'package:midas/Location/Controllers/assign_location_tag_controller.dart';
 import 'package:midas/Location/Controllers/change_location_by_asset_controller.dart';
 import 'package:midas/Location/Controllers/change_location_by_location_controller.dart';
@@ -405,6 +408,17 @@ class AppPages {
         Get.lazyPut(
           () => SearchMaterialLookupController(
             materialRepository: Get.find<MaterialRepository>(),
+          ),
+        );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.materialIssueNote,
+      page: () => const MaterialIssueNoteView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => MaterialIssueNoteController(
+            repository: Get.find<MaterialIssueNoteRepository>(),
           ),
         );
       }),
