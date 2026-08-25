@@ -152,6 +152,13 @@ class AppMenuConfig {
       route: AppRoutes.changeLocationByMaterial,
     ),
     AppMenuItem(
+      permissionLabel: 'Identify Material',
+      title: AppStrings.identifyMaterial,
+      icon: Icons.search,
+      section: AppMenuSection.materials,
+      route: AppRoutes.identifyMaterial,
+    ),
+    AppMenuItem(
       permissionLabel: 'Material Search',
       title: AppStrings.searchMaterial,
       icon: Icons.add_location,

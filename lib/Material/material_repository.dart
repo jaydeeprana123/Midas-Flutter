@@ -1,3 +1,4 @@
+import 'package:midas/Material/Models/identify_material_model.dart';
 import 'package:midas/Material/Models/material_by_inward_type_model.dart';
 import 'package:midas/Material/Models/material_tagging_detail_model.dart';
 import 'package:midas/Material/Models/tagged_material_item_model.dart';
@@ -94,6 +95,18 @@ class MaterialRepository {
       queryParameters: {'materialName': materialName},
     );
     return MaterialTaggingDetailModel.listFromMobileSearchResponse(json);
+  }
+
+  /// Identifies a material by QR / RFID / code for the mobile app.
+  /// `GET /api/MaterialTagging/SearchMaterialForMobileApp?materialname=`
+  Future<IdentifyMaterialResult> identifyMaterialForMobileApp({
+    required String materialData,
+  }) async {
+    final json = await _apiClient.getWithQuery(
+      '/api/MaterialTagging/SearchMaterialForMobileApp',
+      queryParameters: {'materialname': materialData},
+    );
+    return IdentifyMaterialResult.fromJson(json);
   }
 
   /// Unassigns material tag(s) by detail id(s).

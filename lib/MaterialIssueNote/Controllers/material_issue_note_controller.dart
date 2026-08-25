@@ -15,11 +15,11 @@ class MaterialIssueNoteController extends GetxController {
   final MaterialIssueNoteRepository repository;
 
   final remarksController = TextEditingController();
-  final departmentController = TextEditingController();
   final issueNoteDateController = TextEditingController();
 
   final issueNoteNo = ''.obs;
   final issueNoteDate = DateTime.now().obs;
+  final department = ''.obs;
 
   final indentTypes = <IndentTypeModel>[].obs;
   final indentNos = <IndentNoModel>[].obs;
@@ -99,7 +99,7 @@ class MaterialIssueNoteController extends GetxController {
     selectedIndentType.value = type;
     selectedIndentNo.value = null;
     indentNos.clear();
-    departmentController.clear();
+    department.value = '';
     _clearMaterialLines();
 
     if (type == null) return;
@@ -134,7 +134,7 @@ class MaterialIssueNoteController extends GetxController {
 
   Future<void> onIndentNoChanged(IndentNoModel? indent) async {
     selectedIndentNo.value = indent;
-    departmentController.clear();
+    department.value = '';
     _clearMaterialLines();
 
     if (indent == null) return;
@@ -151,7 +151,7 @@ class MaterialIssueNoteController extends GetxController {
         return;
       }
 
-      departmentController.text = result.department;
+      department.value = result.department;
       materialLines.assignAll(
         result.details.map(MaterialIssueLineItem.fromDetail).toList(),
       );
@@ -201,7 +201,7 @@ class MaterialIssueNoteController extends GetxController {
     final year = date.year.toString().padLeft(4, '0');
     final month = date.month.toString().padLeft(2, '0');
     final day = date.day.toString().padLeft(2, '0');
-    return '$year-$month-$day';
+    return '$day-$month-$year';
   }
 
   Future<void> submit() async {
@@ -314,7 +314,7 @@ class MaterialIssueNoteController extends GetxController {
     selectedIndentType.value = null;
     selectedIndentNo.value = null;
     indentNos.clear();
-    departmentController.clear();
+    department.value = '';
     remarksController.clear();
     _setIssueNoteDate(DateTime.now());
     _clearMaterialLines();
@@ -351,7 +351,6 @@ class MaterialIssueNoteController extends GetxController {
   @override
   void onClose() {
     remarksController.dispose();
-    departmentController.dispose();
     issueNoteDateController.dispose();
     _clearMaterialLines();
     super.onClose();

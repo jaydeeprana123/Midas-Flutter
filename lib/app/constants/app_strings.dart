@@ -29,6 +29,9 @@ class AppStrings {
   static const scanQrOrPressButton = 'Scan QR or Press Button for RFID';
   static const scanQrOrPressButtonOrAssetCode =
       'Scan QR or Press Button for RFID or Asset Code';
+  static const scanQrOrPressButtonOrMaterialCode =
+      'Scan QR or Press Button for RFID or Material Code';
+  static const rfid = 'RFID';
   static const scanLocationQrHere = 'Scan Location QR Here';
   static const assetNameOrCode = 'Asset name or Asset code';
   static const assetSerialNumber = 'Asset Serial Number';
@@ -78,9 +81,10 @@ class AppStrings {
   static const identifyEquipment = 'Identify Equipment';
   static const searchEquipment = 'Search Equipment';
   static const materialAssignTag = 'Material Assign Tag';
-  static const materialUnassignTag = 'Material Unassign Tag';
+  static const materialUnassignTag = 'Material DeAssign Tag';
   static const materialAssignLocationTag = 'Assign Location Tag';
   static const searchMaterial = 'Search Material';
+  static const identifyMaterial = 'Identify Material';
   static const materialIssueNote = 'Material Issue Note';
 
   // Material assign tag

@@ -213,12 +213,10 @@ class _HeaderCard extends GetView<MaterialIssueNoteController> {
             ),
           ),
           const SizedBox(height: 16),
-          TextField(
-            controller: controller.departmentController,
-            style: AppTextStyles.body(color: Colors.black87),
-            decoration: const InputDecoration(
-              labelText: AppStrings.department,
-              prefixIcon: Icon(Icons.apartment_outlined),
+          Obx(
+            () => _ReadOnlyField(
+              label: AppStrings.department,
+              value: controller.department.value,
             ),
           ),
           const SizedBox(height: 16),
