@@ -49,14 +49,26 @@ class AssignAssetTagView extends GetView<AssignAssetTagController> {
                           prefixIcon: Icon(Icons.search),
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      TextField(
-                        controller: controller.serialController,
-                        style: AppTextStyles.body(color: Colors.black87),
-                        decoration: const InputDecoration(
-                          labelText: AppStrings.assetSerialNumber,
-                        ),
-                      ),
+                      Obx(() {
+                        final showSerial =
+                            controller.selectedAsset.value?.hasSerialNo ==
+                            true;
+                        if (!showSerial) {
+                          return const SizedBox.shrink();
+                        }
+                        return Column(
+                          children: [
+                            const SizedBox(height: 16),
+                            TextField(
+                              controller: controller.serialController,
+                              style: AppTextStyles.body(color: Colors.black87),
+                              decoration: const InputDecoration(
+                                labelText: AppStrings.assetSerialNumber,
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
                       const SizedBox(height: 22),
                       Obx(
                         () => ElevatedButton(

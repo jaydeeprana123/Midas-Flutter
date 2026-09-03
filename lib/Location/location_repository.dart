@@ -46,13 +46,13 @@ class LocationRepository {
   }
 
   /// Updates asset locations to a new destination.
-  /// `POST /api/Location/UpdateAssetLocation`
+  /// `PUT /api/Location/UpdateAssetLocation`
   Future<StockInResponseModel> updateAssetLocation(
     UpdateAssetLocationModel request,
   ) async {
-    final json = await _apiClient.post(
+    final json = await _apiClient.putRaw(
       '/api/Location/UpdateAssetLocation',
-      body: request.toJson(),
+      data: request.toJson(),
     );
     return StockInResponseModel.fromJson(json);
   }

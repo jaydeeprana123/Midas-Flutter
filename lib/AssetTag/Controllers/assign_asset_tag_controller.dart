@@ -32,6 +32,7 @@ class AssignAssetTagController extends GetxController {
   final tagFocusNode = FocusNode();
 
   final selectedAssetId = Rxn<int>();
+  final selectedAsset = Rxn<AssetLinkTagModel>();
   final isSubmitting = false.obs;
   final isRfidConnected = false.obs;
 
@@ -93,8 +94,12 @@ class AssignAssetTagController extends GetxController {
 
     final result = await Get.toNamed(AppRoutes.assetSearch);
     if (result is AssetLinkTagModel) {
+      selectedAsset.value = result;
       selectedAssetId.value = result.assetId;
       assetController.text = result.displayLabel;
+      if (!result.hasSerialNo) {
+        serialController.clear();
+      }
     }
   }
 
@@ -177,6 +182,7 @@ class AssignAssetTagController extends GetxController {
     assetController.clear();
     serialController.clear();
     selectedAssetId.value = null;
+    selectedAsset.value = null;
   }
 
   @override
