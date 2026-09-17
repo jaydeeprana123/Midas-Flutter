@@ -31,7 +31,7 @@ class AssignLocationTagController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _initRfid();
+    //  _initRfid();
   }
 
   Future<void> _initRfid() async {

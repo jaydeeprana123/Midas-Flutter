@@ -55,10 +55,10 @@ class AssignLocationTagView extends GetView<AssignLocationTagController> {
                             shape: const CircleBorder(),
                             child: InkWell(
                               onTap: () async {
-                              controller.beginAssetDialog();
-                              await showAddAssetQrDialog(controller);
-                              controller.endAssetDialog();
-                            },
+                                controller.beginAssetDialog();
+                                await showAddAssetQrDialog(controller);
+                                controller.endAssetDialog();
+                              },
                               customBorder: const CircleBorder(),
                               child: const Padding(
                                 padding: EdgeInsets.all(10),
@@ -82,7 +82,8 @@ class AssignLocationTagView extends GetView<AssignLocationTagController> {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: controller.assetTags.length,
-                          separatorBuilder: (_, index) => const Divider(height: 1),
+                          separatorBuilder: (_, index) =>
+                              const Divider(height: 1),
                           itemBuilder: (context, index) {
                             final tag = controller.assetTags[index];
                             return Padding(
@@ -189,14 +190,14 @@ class _LocationField extends GetView<AssignLocationTagController> {
             decoration: InputDecoration(
               labelText: AppStrings.scanLocationQrHere,
               prefixIcon: const Icon(Icons.qr_code_2),
-              suffixIcon: Obx(
-                () => controller.isRfidConnected.value
-                    ? const Tooltip(
-                        message: AppStrings.rfidReaderConnected,
-                        child: Icon(Icons.sensors, color: AppTheme.primary),
-                      )
-                    : const SizedBox.shrink(),
-              ),
+              // suffixIcon: Obx(
+              //   () => controller.isRfidConnected.value
+              //       ? const Tooltip(
+              //           message: AppStrings.rfidReaderConnected,
+              //           child: Icon(Icons.sensors, color: AppTheme.primary),
+              //         )
+              //       : const SizedBox.shrink(),
+              // ),
             ),
           ),
         ),

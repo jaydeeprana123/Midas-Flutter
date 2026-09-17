@@ -19,6 +19,7 @@ class SplashView extends GetView<SplashController> {
           AppAssets.appIcon,
           width: 180,
           height: 180,
+          color: Colors.white,
         ),
       ),
     );

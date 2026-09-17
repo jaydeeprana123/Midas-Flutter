@@ -4,6 +4,7 @@ import 'package:midas/AssetTag/asset_repository.dart';
 import 'package:midas/Audit/audit_repository.dart';
 import 'package:midas/Equipment/equipment_repository.dart';
 import 'package:midas/Material/material_repository.dart';
+import 'package:midas/MaterialIssueNote/material_issue_note_repository.dart';
 import 'package:midas/Material/Services/material_sqlite_service.dart';
 import 'package:midas/Material/Services/material_unassign_sync_service.dart';
 import 'package:midas/Material/Services/network_connectivity_service.dart';
@@ -53,6 +54,10 @@ class InitialBinding extends Bindings {
     );
     Get.put<MaterialRepository>(
       MaterialRepository(apiClient),
+      permanent: true,
+    );
+    Get.put<MaterialIssueNoteRepository>(
+      MaterialIssueNoteRepository(apiClient),
       permanent: true,
     );
     Get.put<MaterialSqliteService>(MaterialSqliteService(), permanent: true);

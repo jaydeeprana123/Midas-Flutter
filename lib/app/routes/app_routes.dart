@@ -9,6 +9,9 @@ abstract class AppRoutes {
   static const changeLocationByLocation = '/change-location-by-location';
   static const changeLocationByAsset = '/change-location-by-asset';
   static const scanAssetForChangeLocation = '/scan-asset-for-change-location';
+  static const changeLocationByMaterial = '/change-location-by-material';
+  static const scanMaterialForChangeLocation =
+      '/scan-material-for-change-location';
   static const identifyAsset = '/identify-asset';
   static const auditAssets = '/audit-assets';
   static const searchAsset = '/search-asset';
@@ -26,4 +29,6 @@ abstract class AppRoutes {
   static const materialMultiSelectSearch = '/material-multi-select-search';
   static const searchMaterial = '/search-material';
   static const searchMaterialLookup = '/search-material-lookup';
+  static const identifyMaterial = '/identify-material';
+  static const materialIssueNote = '/material-issue-note';
 }

@@ -27,6 +27,8 @@ class HomeController extends GetxController {
   final materialMenuItems = <AppMenuItem>[].obs;
   final drawerMenuItems = <AppMenuItem>[].obs;
 
+  Set<String> _permissionLabels = {};
+
   bool get showAssetsTab => assetMenuItems.isNotEmpty;
   bool get showEquipmentsTab => equipmentMenuItems.isNotEmpty;
   bool get showMaterialsTab => materialMenuItems.isNotEmpty;
@@ -47,6 +49,8 @@ class HomeController extends GetxController {
         .map((permission) => permission.label.trim().toLowerCase())
         .toSet();
 
+    _permissionLabels = labels;
+
     assetMenuItems.assignAll(
       AppMenuConfig.visibleItems(
         labels,
@@ -61,24 +65,13 @@ class HomeController extends GetxController {
         homeOnly: true,
       ),
     );
-
-    // Always show Material tab/items for all users (permission check skipped).
-    final materialItems = AppMenuConfig.items
-        .where((item) => item.section == AppMenuSection.materials)
-        .toList();
-    materialMenuItems.assignAll(materialItems.where((item) => item.showOnHome));
-
-    drawerMenuItems.assignAll(
-      AppMenuConfig.visibleItems(labels, drawerOnly: true),
+    materialMenuItems.assignAll(
+      AppMenuConfig.visibleItems(
+        labels,
+        section: AppMenuSection.materials,
+        homeOnly: true,
+      ),
     );
-    final existingLabels = drawerMenuItems
-        .map((item) => item.permissionLabel)
-        .toSet();
-    for (final item in materialItems.where((item) => item.showInDrawer)) {
-      if (!existingLabels.contains(item.permissionLabel)) {
-        drawerMenuItems.add(item);
-      }
-    }
 
     if (showAssetsTab) {
       selectedTab.value = 0;
@@ -87,6 +80,8 @@ class HomeController extends GetxController {
     } else if (showMaterialsTab) {
       selectedTab.value = 2;
     }
+
+    _refreshDrawerMenu();
   }
 
   List<AppMenuItem> itemsForTab(int tabIndex) {
@@ -99,6 +94,27 @@ class HomeController extends GetxController {
         return materialMenuItems;
       default:
         return const [];
+    }
+  }
+
+  void _refreshDrawerMenu() {
+    drawerMenuItems.assignAll(
+      AppMenuConfig.visibleItems(
+        _permissionLabels,
+        section: _sectionForTab(selectedTab.value),
+        drawerOnly: true,
+      ),
+    );
+  }
+
+  AppMenuSection _sectionForTab(int tabIndex) {
+    switch (tabIndex) {
+      case 1:
+        return AppMenuSection.equipments;
+      case 2:
+        return AppMenuSection.materials;
+      default:
+        return AppMenuSection.assets;
     }
   }
 
@@ -117,6 +133,7 @@ class HomeController extends GetxController {
 
   void onTabChanged(int index) {
     selectedTab.value = index;
+    _refreshDrawerMenu();
   }
 
   Future<void> onLogoutTap() async {

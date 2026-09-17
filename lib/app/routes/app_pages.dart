@@ -31,6 +31,7 @@ import 'package:midas/Equipment/Views/search_tagged_equipment_view.dart';
 import 'package:midas/Equipment/equipment_repository.dart';
 import 'package:midas/Material/Controllers/assign_material_location_tag_controller.dart';
 import 'package:midas/Material/Controllers/assign_material_tag_controller.dart';
+import 'package:midas/Material/Controllers/identify_material_controller.dart';
 import 'package:midas/Material/Controllers/material_multi_select_search_controller.dart';
 import 'package:midas/Material/Controllers/material_search_controller.dart';
 import 'package:midas/Material/Controllers/search_material_controller.dart';
@@ -38,6 +39,7 @@ import 'package:midas/Material/Controllers/search_material_lookup_controller.dar
 import 'package:midas/Material/Controllers/unassign_material_tag_controller.dart';
 import 'package:midas/Material/Views/assign_material_location_tag_view.dart';
 import 'package:midas/Material/Views/assign_material_tag_view.dart';
+import 'package:midas/Material/Views/identify_material_view.dart';
 import 'package:midas/Material/Views/material_multi_select_search_view.dart';
 import 'package:midas/Material/Views/material_search_view.dart';
 import 'package:midas/Material/Views/search_material_lookup_view.dart';
@@ -47,13 +49,19 @@ import 'package:midas/Material/Services/material_sqlite_service.dart';
 import 'package:midas/Material/Services/material_unassign_sync_service.dart';
 import 'package:midas/Material/Services/network_connectivity_service.dart';
 import 'package:midas/Material/material_repository.dart';
+import 'package:midas/MaterialIssueNote/Controllers/material_issue_note_controller.dart';
+import 'package:midas/MaterialIssueNote/Views/material_issue_note_view.dart';
+import 'package:midas/MaterialIssueNote/material_issue_note_repository.dart';
 import 'package:midas/Location/Controllers/assign_location_tag_controller.dart';
 import 'package:midas/Location/Controllers/change_location_by_asset_controller.dart';
 import 'package:midas/Location/Controllers/change_location_by_location_controller.dart';
+import 'package:midas/Location/Controllers/change_location_by_material_controller.dart';
 import 'package:midas/Location/Views/assign_location_tag_view.dart';
 import 'package:midas/Location/Views/change_location_by_asset_view.dart';
 import 'package:midas/Location/Views/change_location_by_location_view.dart';
+import 'package:midas/Location/Views/change_location_by_material_view.dart';
 import 'package:midas/Location/Views/scan_asset_qr_change_location_view.dart';
+import 'package:midas/Location/Views/scan_material_qr_change_location_view.dart';
 import 'package:midas/Location/location_repository.dart';
 import 'package:midas/Auth/Controllers/login_controller.dart';
 import 'package:midas/Auth/Controllers/splash_controller.dart';
@@ -181,6 +189,23 @@ class AppPages {
     GetPage(
       name: AppRoutes.scanAssetForChangeLocation,
       page: () => const ScanAssetQrChangeLocationView(),
+    ),
+    GetPage(
+      name: AppRoutes.changeLocationByMaterial,
+      page: () => const ChangeLocationByMaterialView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => ChangeLocationByMaterialController(
+            locationRepository: Get.find<LocationRepository>(),
+            materialRepository: Get.find<MaterialRepository>(),
+            rfidService: Get.find<RfidService>(),
+          ),
+        );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.scanMaterialForChangeLocation,
+      page: () => const ScanMaterialQrChangeLocationView(),
     ),
     GetPage(
       name: AppRoutes.identifyAsset,
@@ -385,8 +410,29 @@ class AppPages {
         Get.lazyPut(
           () => SearchMaterialLookupController(
             materialRepository: Get.find<MaterialRepository>(),
-            sqliteService: Get.find<MaterialSqliteService>(),
-            connectivityService: Get.find<NetworkConnectivityService>(),
+          ),
+        );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.identifyMaterial,
+      page: () => const IdentifyMaterialView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => IdentifyMaterialController(
+            materialRepository: Get.find<MaterialRepository>(),
+            rfidService: Get.find<RfidService>(),
+          ),
+        );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.materialIssueNote,
+      page: () => const MaterialIssueNoteView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => MaterialIssueNoteController(
+            repository: Get.find<MaterialIssueNoteRepository>(),
           ),
         );
       }),

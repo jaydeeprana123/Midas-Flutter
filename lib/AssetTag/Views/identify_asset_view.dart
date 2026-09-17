@@ -105,7 +105,7 @@ class _InputCard extends GetView<IdentifyAssetController> {
                   controller: controller.tagController,
                   style: AppTextStyles.body(color: Colors.black87),
                   decoration: InputDecoration(
-                    labelText: AppStrings.scanQrOrPressButton,
+                    labelText: AppStrings.scanQrOrPressButtonOrAssetCode,
                     prefixIcon: const Icon(Icons.qr_code_2),
                     suffixIcon: Obx(
                       () => controller.isRfidConnected.value
@@ -134,8 +134,9 @@ class _InputCard extends GetView<IdentifyAssetController> {
           const SizedBox(height: 22),
           Obx(
             () => ElevatedButton(
-              onPressed:
-                  controller.isFetching.value ? null : controller.fetchDetails,
+              onPressed: controller.isFetching.value
+                  ? null
+                  : controller.fetchDetails,
               child: controller.isFetching.value
                   ? const SizedBox(
                       height: 22,
@@ -193,6 +194,7 @@ class _DetailsCard extends GetView<IdentifyAssetController> {
                 value: asset.locationPathLabel,
               ),
             _DetailRow(label: AppStrings.remarks, value: asset.remarks),
+            _DetailRow(label: AppStrings.isTaggable, value: asset.isTaggable),
           ],
         ),
       );
@@ -213,10 +215,7 @@ class _DetailRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '$label : ',
-            style: AppTextStyles.body(color: Colors.black54),
-          ),
+          Text('$label : ', style: AppTextStyles.body(color: Colors.black54)),
           Expanded(
             child: Text(
               value,

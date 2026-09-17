@@ -8,15 +8,27 @@ String assetLinkTagModelListToJson(List<AssetLinkTagModel> data) =>
 
 class AssetLinkTagModel {
   int assetId;
+  int? orgId;
+  String organizationName;
   String assetName;
   String assetCode;
   int? quantity;
+  bool hasSerialNo;
+  int? untaggedQuantity;
+  int? remainingQuantity;
+  int? taggedQuantity;
 
   AssetLinkTagModel({
     required this.assetId,
+    this.orgId,
+    this.organizationName = '',
     required this.assetName,
     required this.assetCode,
     this.quantity,
+    this.hasSerialNo = false,
+    this.untaggedQuantity,
+    this.remainingQuantity,
+    this.taggedQuantity,
   });
 
   /// Text shown in the search list, e.g.
@@ -45,6 +57,10 @@ class AssetLinkTagModel {
               json["code"] ??
               json["Code"],
         ),
+        orgId: _toInt(json["orgId"] ?? json["OrgId"]),
+        organizationName: _toStr(
+          json["organizationName"] ?? json["OrganizationName"],
+        ),
         quantity: _toInt(
           json["quantity"] ??
               json["Quantity"] ??
@@ -53,13 +69,29 @@ class AssetLinkTagModel {
               json["availableQuantity"] ??
               json["AvailableQuantity"],
         ),
+        hasSerialNo: _toBool(json["hasSerialNo"] ?? json["HasSerialNo"]),
+        untaggedQuantity: _toInt(
+          json["untaggedQuantity"] ?? json["UntaggedQuantity"],
+        ),
+        remainingQuantity: _toInt(
+          json["remainingQuantity"] ?? json["RemainingQuantity"],
+        ),
+        taggedQuantity: _toInt(
+          json["taggedQuantity"] ?? json["TaggedQuantity"],
+        ),
       );
 
   Map<String, dynamic> toJson() => {
         "assetId": assetId,
+        "orgId": orgId,
+        "organizationName": organizationName,
         "assetName": assetName,
         "assetCode": assetCode,
         "quantity": quantity,
+        "hasSerialNo": hasSerialNo,
+        "untaggedQuantity": untaggedQuantity,
+        "remainingQuantity": remainingQuantity,
+        "taggedQuantity": taggedQuantity,
       };
 
   /// Extracts the list of assets from a variety of possible envelope shapes.
@@ -94,5 +126,15 @@ class AssetLinkTagModel {
     if (value is double) return value.toInt();
     if (value is String) return int.tryParse(value);
     return null;
+  }
+
+  static bool _toBool(dynamic value) {
+    if (value is bool) return value;
+    if (value is num) return value != 0;
+    if (value is String) {
+      final normalized = value.trim().toLowerCase();
+      return normalized == 'true' || normalized == '1';
+    }
+    return false;
   }
 }

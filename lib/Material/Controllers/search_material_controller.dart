@@ -75,8 +75,6 @@ class SearchMaterialController extends GetxController {
         Get.lazyPut(
           () => SearchMaterialLookupController(
             materialRepository: Get.find<MaterialRepository>(),
-            sqliteService: Get.find<MaterialSqliteService>(),
-            connectivityService: Get.find<NetworkConnectivityService>(),
           ),
         );
       }),
@@ -160,6 +158,10 @@ class SearchMaterialController extends GetxController {
     if (!isScanning.value) return;
     final tag = epc.trim();
     if (tag.isEmpty) return;
+
+    final selectedRfid = selectedMaterial.value?.rfid?.trim() ?? '';
+    if (selectedRfid.isEmpty) return;
+    if (tag.toUpperCase() != selectedRfid.toUpperCase()) return;
 
     await locationService.refresh();
     await rfidService.beep(success: true);

@@ -6,4 +6,5 @@ class AppAssets {
 
   static const splashLogo = appIcon;
   static const toolbarLogo = 'assets/images/toolbar_logo.png';
+  static const poweredByLogo = 'assets/images/powered_by_logo.png';
 }
