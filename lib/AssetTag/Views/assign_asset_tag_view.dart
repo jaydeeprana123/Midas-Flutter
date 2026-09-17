@@ -51,8 +51,7 @@ class AssignAssetTagView extends GetView<AssignAssetTagController> {
                       ),
                       Obx(() {
                         final showSerial =
-                            controller.selectedAsset.value?.hasSerialNo ==
-                            true;
+                            controller.selectedAsset.value?.hasSerialNo == true;
                         if (!showSerial) {
                           return const SizedBox.shrink();
                         }
