@@ -36,6 +36,8 @@ class AssignMaterialLocationTagController extends GetxController {
 
   final selectedSource = Rxn<MaterialInwardSource>();
   final availableMaterials = <MaterialByInwardTypeModel>[].obs;
+  final _allMaterials = <MaterialByInwardTypeModel>[];
+  var _allMaterialsLoaded = false;
   final selectedMaterial = Rxn<MaterialByInwardTypeModel>();
 
   /// Response from GetAllTaggedMaterialdataByMaterialId for the selected material.
@@ -76,6 +78,7 @@ class AssignMaterialLocationTagController extends GetxController {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusLocationField();
     });
+    unawaited(_loadAllMaterials());
   }
 
   Future<void> _initRfid() async {
@@ -109,7 +112,7 @@ class AssignMaterialLocationTagController extends GetxController {
     }
   }
 
-  Future<void> onSourceChanged(MaterialInwardSource? source) async {
+  void onSourceChanged(MaterialInwardSource? source) {
     selectedSource.value = source;
     selectedMaterial.value = null;
     taggedMaterials.clear();
@@ -117,69 +120,86 @@ class AssignMaterialLocationTagController extends GetxController {
     materialSearchController.clear();
 
     if (source == null) return;
+    _applySourceFilter(source.id);
+  }
+
+  Future<void> _loadAllMaterials() async {
+    if (isLoadingMaterials.value) return;
 
     isLoadingMaterials.value = true;
     try {
       final online = await connectivityService.refresh();
       if (online) {
-        await _loadMaterialsOnline(source.id);
+        await _fetchAllMaterialsOnline();
       } else {
-        await _loadMaterialsOffline(source.id);
+        await _fetchAllMaterialsOffline();
       }
+      _allMaterialsLoaded = true;
     } finally {
       isLoadingMaterials.value = false;
+      final source = selectedSource.value;
+      if (source != null) {
+        _applySourceFilter(source.id);
+      }
     }
   }
 
-  /// Source select API:
-  /// GET GetAllMaterialByInwardTypeId/{Id}
-  Future<void> _loadMaterialsOnline(int sourceId) async {
+  Future<void> _fetchAllMaterialsOnline() async {
     try {
-      final materials = await materialRepository.getAllMaterialByInwardTypeId(
-        sourceId,
+      final result = await materialRepository.getAllMaterialsForAllSources(
         onlyTaggedPendingLocation: true,
       );
-      availableMaterials.assignAll(materials);
-      await sqliteService.replaceAssignLocationMaterials(sourceId, materials);
+      _allMaterials
+        ..clear()
+        ..addAll(result);
+      await sqliteService.replaceAllAssignLocationMaterials(result);
     } on DioException catch (e) {
-      final cached = await sqliteService.getAssignLocationMaterials(sourceId);
-      if (cached.isNotEmpty) {
-        availableMaterials.assignAll(cached);
-        return;
-      }
-      final data = e.response?.data;
-      Get.snackbar(
-        AppStrings.fetchFailed,
-        data is Map && data['message'] != null
-            ? data['message'].toString()
+      await _fetchAllMaterialsOffline(
+        showErrorOnEmpty: true,
+        errorMessage: e.response?.data is Map &&
+                (e.response?.data as Map)['message'] != null
+            ? (e.response?.data as Map)['message'].toString()
             : AppStrings.unableToFetchMaterialsRetry,
-        snackPosition: SnackPosition.BOTTOM,
       );
     } catch (_) {
-      final cached = await sqliteService.getAssignLocationMaterials(sourceId);
-      if (cached.isNotEmpty) {
-        availableMaterials.assignAll(cached);
-        return;
-      }
+      await _fetchAllMaterialsOffline(
+        showErrorOnEmpty: true,
+        errorMessage: AppStrings.unableToFetchMaterialsRetry,
+      );
+    }
+  }
+
+  Future<void> _fetchAllMaterialsOffline({
+    bool showErrorOnEmpty = false,
+    String? errorMessage,
+  }) async {
+    final cached = await sqliteService.getAllAssignLocationMaterials();
+    _allMaterials
+      ..clear()
+      ..addAll(cached);
+
+    if (cached.isEmpty && showErrorOnEmpty) {
       Get.snackbar(
         AppStrings.fetchFailed,
-        AppStrings.unableToFetchMaterialsRetry,
+        errorMessage ?? AppStrings.noOfflineMaterialsForSource,
         snackPosition: SnackPosition.BOTTOM,
       );
     }
   }
 
-  Future<void> _loadMaterialsOffline(int sourceId) async {
-    final cached = await sqliteService.getAssignLocationMaterials(sourceId);
-    if (cached.isNotEmpty) {
-      availableMaterials.assignAll(cached);
-      return;
+  void _applySourceFilter(int sourceId) {
+    final filtered = _allMaterials
+        .where((material) => material.inwardTypeId == sourceId)
+        .toList();
+    availableMaterials.assignAll(filtered);
+
+    if (filtered.isEmpty && _allMaterialsLoaded) {
+      Get.snackbar(
+        AppStrings.noMaterialsFound,
+        AppStrings.noMaterialsForSelectedSource,
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
-    Get.snackbar(
-      AppStrings.fetchFailed,
-      AppStrings.noOfflineMaterialsForSource,
-      snackPosition: SnackPosition.BOTTOM,
-    );
   }
 
   Future<void> openMaterialSearch() async {
