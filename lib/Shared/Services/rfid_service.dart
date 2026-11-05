@@ -92,6 +92,34 @@ class RfidService {
     }
   }
 
+  /// Reads the frequency mode currently configured on the connected reader.
+  /// Returns `null` when the reader is not connected or the read fails.
+  Future<int?> getFrequency() async {
+    try {
+      return await _methods.invokeMethod<int>('getFrequency');
+    } on MissingPluginException {
+      return null;
+    } on PlatformException {
+      return null;
+    }
+  }
+
+  /// Sets the reader's frequency mode. Returns `false` when the reader is not
+  /// connected or the SDK rejects the value.
+  Future<bool> setFrequency(int frequency) async {
+    try {
+      final result = await _methods.invokeMethod<bool>(
+        'setFrequency',
+        {'frequency': frequency},
+      );
+      return result ?? false;
+    } on MissingPluginException {
+      return false;
+    } on PlatformException {
+      return false;
+    }
+  }
+
   /// Plays a success/failure beep on the reader (same sound used for scans).
   Future<void> beep({bool success = true}) async {
     try {

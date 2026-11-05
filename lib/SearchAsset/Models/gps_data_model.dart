@@ -31,6 +31,26 @@ class GpsDataModel {
         'frequencyPoint': frequencyPoint,
       };
 
+  /// Whether this reading can be drawn on the scan map.
+  ///
+  /// Missing or invalid means a coordinate is NaN or infinite, latitude is
+  /// outside -90..90, longitude is outside -180..180, or both values are 0.
+  /// (0, 0) is the location cache before the first GPS fix, so it is treated
+  /// as no location yet. A latitude of 0 with a non-zero longitude is valid.
+  bool get hasMappableLocation {
+    if (latitude.isNaN ||
+        longitude.isNaN ||
+        latitude.isInfinite ||
+        longitude.isInfinite) {
+      return false;
+    }
+    if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+      return false;
+    }
+    if (latitude == 0 && longitude == 0) return false;
+    return true;
+  }
+
   GpsDataModel copyWith({
     double? latitude,
     double? longitude,

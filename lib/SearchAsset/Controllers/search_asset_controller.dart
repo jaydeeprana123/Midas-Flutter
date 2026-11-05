@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:midas/SearchAsset/Controllers/search_asset_lookup_controller.dart';
 import 'package:midas/SearchAsset/Views/search_asset_lookup_view.dart';
+import 'package:midas/SearchAsset/Models/dashboard_search_asset_model.dart';
 import 'package:midas/SearchAsset/Models/gps_data_model.dart';
 import 'package:midas/SearchAsset/Models/search_asset_item_model.dart';
 import 'package:midas/SearchAsset/search_asset_repository.dart';
@@ -34,6 +35,18 @@ class SearchAssetController extends GetxController {
   final isRfidConnected = false.obs;
 
   final List<GpsDataModel> _gpsReadings = [];
+
+  /// Markers drawn from [_gpsReadings]. One entry per RFID tag.
+  ///
+  /// This list is not cleared when Stop uploads and then clears
+  /// [_gpsReadings], so the pins stay on the map after scanning ends.
+  /// A new Start, or choosing another asset, clears it.
+  final scanMarkers = <GpsDataModel>[].obs;
+
+  /// Assets already returned by the Start dashboard lookup. Used only to
+  /// label markers. No extra request is made for the map.
+  final List<DashboardSearchAssetModel> _trackedAssets = [];
+
   StreamSubscription<String>? _tagSubscription;
 
   bool get canStart =>
@@ -49,7 +62,74 @@ class SearchAssetController extends GetxController {
     super.onInit();
     _initRfid();
     locationService.startTracking();
+    // _seedDummyMapReadings();
   }
+
+  // Temporary sample pins so the map can be checked before a live RFID scan.
+  // Start still clears _gpsReadings before a real session, so these are
+  // not uploaded.
+  // void _seedDummyMapReadings() {
+  //   const samples = <({
+  //     String name,
+  //     String code,
+  //     String tag,
+  //     double latitude,
+  //     double longitude,
+  //   })>[
+  //     (
+  //       name: 'Sample Laptop',
+  //       code: 'AST-DEMO-01',
+  //       tag: 'TAG-DEMO-01',
+  //       latitude: 28.6139,
+  //       longitude: 77.2090,
+  //     ),
+  //     (
+  //       name: 'Sample Printer',
+  //       code: 'AST-DEMO-02',
+  //       tag: 'TAG-DEMO-02',
+  //       latitude: 28.6289,
+  //       longitude: 77.2195,
+  //     ),
+  //   ];
+  //
+  //   for (final sample in samples) {
+  //     final alreadyStored = _gpsReadings.any(
+  //       (item) => item.rfidNumber == sample.tag,
+  //     );
+  //     if (!alreadyStored) {
+  //       _gpsReadings.add(
+  //         GpsDataModel(
+  //           rfidNumber: sample.tag,
+  //           latitude: sample.latitude,
+  //           longitude: sample.longitude,
+  //           timestamp: LocationService.deviceTimestamp(),
+  //           isHandHeld: true,
+  //         ),
+  //       );
+  //     }
+  //
+  //     final alreadyLabeled = _trackedAssets.any(
+  //       (asset) =>
+  //           asset.rfid == sample.tag || asset.tagCode == sample.tag,
+  //     );
+  //     if (!alreadyLabeled) {
+  //       _trackedAssets.add(
+  //         DashboardSearchAssetModel(
+  //           assetCode: sample.code,
+  //           tagCode: sample.tag,
+  //           assetName: sample.name,
+  //           rfid: sample.tag,
+  //           locationCode: '',
+  //           serialNo: '',
+  //         ),
+  //       );
+  //     }
+  //
+  //     _publishScanMarker(
+  //       _gpsReadings.firstWhere((item) => item.rfidNumber == sample.tag),
+  //     );
+  //   }
+  // }
 
   Future<void> _initRfid() async {
     _tagSubscription = rfidService.tagStream.listen(_onTagRead);
@@ -81,6 +161,9 @@ class SearchAssetController extends GetxController {
     selectedAsset.value = result;
     assetController.text = result.trackingLabel;
     _gpsReadings.clear();
+    _trackedAssets.clear();
+    scanMarkers.clear();
+    // _seedDummyMapReadings();
   }
 
   Future<void> start() async {
@@ -103,6 +186,10 @@ class SearchAssetController extends GetxController {
       }
 
       _gpsReadings.clear();
+      scanMarkers.clear();
+      _trackedAssets
+        ..clear()
+        ..addAll(result.assets);
 
       final started = await rfidService.startInventory();
       if (!started) {
@@ -196,6 +283,64 @@ class SearchAssetController extends GetxController {
     } else {
       _gpsReadings.add(reading);
     }
+
+    // Duplicate tags stay a single marker: the pin moves to the latest valid
+    // fix. An invalid fix does not add a pin and does not move one that
+    // already has a valid position. The reading itself still stays in
+    // [_gpsReadings] for the existing Stop upload.
+    final stored = existingIndex >= 0 ? _gpsReadings[existingIndex] : reading;
+    _publishScanMarker(stored);
+  }
+
+  /// Name, code, and tag shown when a marker is tapped.
+  ///
+  /// Matched against the asset list already loaded at Start, then the
+  /// selected asset. The scanned RFID is always shown as the tag.
+  ScanMarkerDetails detailsFor(String rfidNumber) {
+    final tag = rfidNumber.trim();
+    final needle = tag.toLowerCase();
+
+    for (final asset in _trackedAssets) {
+      final rfid = asset.rfid.toLowerCase();
+      final tagCode = asset.tagCode.toLowerCase();
+      final matchesRfid = rfid.isNotEmpty && rfid == needle;
+      final matchesTag = tagCode.isNotEmpty && tagCode == needle;
+      if (matchesRfid || matchesTag) {
+        return ScanMarkerDetails(
+          assetName: asset.assetName,
+          assetCode: asset.assetCode,
+          tagCode: asset.tagCode.isNotEmpty ? asset.tagCode : tag,
+        );
+      }
+    }
+
+    final selected = selectedAsset.value;
+    if (selected != null && selected.tagCode.trim().toLowerCase() == needle) {
+      return ScanMarkerDetails(
+        assetName: selected.assetName,
+        assetCode: selected.assetCode,
+        tagCode: selected.tagCode.isNotEmpty ? selected.tagCode : tag,
+      );
+    }
+
+    return ScanMarkerDetails(
+      assetName: '',
+      assetCode: '',
+      tagCode: tag,
+    );
+  }
+
+  void _publishScanMarker(GpsDataModel reading) {
+    if (!reading.hasMappableLocation) return;
+
+    final index = scanMarkers.indexWhere(
+      (item) => item.rfidNumber == reading.rfidNumber,
+    );
+    if (index >= 0) {
+      scanMarkers[index] = reading;
+    } else {
+      scanMarkers.add(reading);
+    }
   }
 
   @override
@@ -207,4 +352,16 @@ class SearchAssetController extends GetxController {
     assetController.dispose();
     super.onClose();
   }
+}
+
+class ScanMarkerDetails {
+  const ScanMarkerDetails({
+    required this.assetName,
+    required this.assetCode,
+    required this.tagCode,
+  });
+
+  final String assetName;
+  final String assetCode;
+  final String tagCode;
 }

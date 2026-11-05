@@ -61,6 +61,14 @@ class AppStrings {
 
   // Home
   static const dashboard = 'Dashboard';
+  static const frequency = 'Frequency';
+  static const rfidFrequencySettings = 'RFID Frequency Settings';
+  static const currentFrequency = 'Current Frequency';
+  static const selectFrequency = 'Select Frequency';
+  static const unableToReadFrequency =
+      'Unable to read the current frequency from the RFID device.';
+  static const unableToSetFrequency =
+      'Unable to set the frequency on the RFID device.';
   static const assetsTab = 'ASSETS';
   static const equipmentsTab = 'EQUIPMENTS';
   static const materialsTab = 'MATERIAL';
@@ -132,6 +140,7 @@ class AppStrings {
       'No internet connection. Scanned tag data has been saved and will be synced automatically.';
   static const materialTrackingSavedForFutureSync =
       'Scanning stopped. Tag data has been saved locally and will be synced when the upload API is available.';
+  static const scannedMaterial = 'Scanned Material';
 
   // Material unassign tag
   static const unassignTag = 'DeAssign Tag';
@@ -365,6 +374,8 @@ class AppStrings {
       'Unable to save tracking data. Please try again.';
   static const noTrackingDataScanned =
       'Scanning has been stopped. No data was scanned.';
+  static const scannedAsset = 'Scanned Asset';
+  static const mapAvailableOnMobile = 'Map is available on Android and iOS.';
 
   // Audit assets
   static const selectAuditName = 'Select Audit Name';
