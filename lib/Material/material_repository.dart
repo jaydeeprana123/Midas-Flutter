@@ -11,21 +11,23 @@ class MaterialRepository {
 
   final ApiClient _apiClient;
 
-  /// Materials for a given inward/source type.
-  /// `GET /api/MaterialTagging/GetAllMaterialByInwardTypeId/{Id}`
-  Future<List<MaterialByInwardTypeModel>> getAllMaterialByInwardTypeId(
-    int inwardTypeId, {
-    bool? onlyTaggedPendingLocation,
+  /// Materials for all inward/source types in one response.
+  /// `GET /api/MaterialTagging/GetAllMaterialByInwardTypeId/0?allSources=true`
+  Future<List<MaterialByInwardTypeModel>> getAllMaterialsForAllSources({
+    bool onlyTaggedPendingLocation = false,
   }) async {
-    final json = onlyTaggedPendingLocation == null
-        ? await _apiClient.get(
-            '/api/MaterialTagging/GetAllMaterialByInwardTypeId/$inwardTypeId',
+    const path = '/api/MaterialTagging/GetAllMaterialByInwardTypeId/0';
+    final json = onlyTaggedPendingLocation
+        ? await _apiClient.getWithQuery(
+            path,
+            queryParameters: {
+              'allSources': true,
+              'onlyTaggedPendingLocation': true,
+            },
           )
         : await _apiClient.getWithQuery(
-            '/api/MaterialTagging/GetAllMaterialByInwardTypeId/$inwardTypeId',
-            queryParameters: {
-              'onlyTaggedPendingLocation': onlyTaggedPendingLocation,
-            },
+            path,
+            queryParameters: {'allSources': true},
           );
     return MaterialByInwardTypeModel.listFromResponse(json);
   }

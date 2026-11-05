@@ -4,7 +4,9 @@
 	<dict>
 		<key>NSCameraUsageDescription</key>
 		<string>This app needs camera access to scan QR codes and barcodes for asset tags.</string>
-		<key>CFBundleDevelopmentRegion</key>
+		<key>GMSApiKey</key>
+	<string></string>
+	<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
 		<string>Midas Flutter</string>

@@ -353,19 +353,16 @@ class MaterialSqliteService {
     );
   }
 
-  /// Replaces cached materials for one source id only; other source ids remain.
-  Future<void> replaceMaterialsForSourceId(
-    int inwardTypeId,
+  /// Replaces the full Assign Tag materials cache (all sources).
+  Future<void> replaceAllMaterialsForAssignTag(
     List<MaterialByInwardTypeModel> items,
   ) async {
     final db = await database;
     final batch = db.batch();
-    batch.delete(
-      'material_by_inward_type',
-      where: 'inward_type_id = ?',
-      whereArgs: [inwardTypeId],
-    );
+    batch.delete('material_by_inward_type');
     for (final item in items) {
+      final inwardTypeId = item.inwardTypeId;
+      if (inwardTypeId == null || inwardTypeId <= 0) continue;
       batch.insert(
         'material_by_inward_type',
         item.toSqliteMap(inwardTypeId),
@@ -373,6 +370,15 @@ class MaterialSqliteService {
       );
     }
     await batch.commit(noResult: true);
+  }
+
+  Future<List<MaterialByInwardTypeModel>> getAllMaterialsForAssignTag() async {
+    final db = await database;
+    final rows = await db.query(
+      'material_by_inward_type',
+      orderBy: 'material_name COLLATE NOCASE ASC',
+    );
+    return rows.map(MaterialByInwardTypeModel.fromSqlite).toList();
   }
 
   Future<List<MaterialByInwardTypeModel>> getMaterialsBySourceId(
@@ -456,21 +462,18 @@ class MaterialSqliteService {
     );
   }
 
-  /// Assign Location Tag cache:
-  /// `GetAllMaterialByInwardTypeId?onlyTaggedPendingLocation=true`
+  /// Assign Location Tag cache (all sources):
+  /// `GetAllMaterialByInwardTypeId?allSources=true&onlyTaggedPendingLocation=true`
   /// (separate from Assign Tag's `material_by_inward_type` table).
-  Future<void> replaceAssignLocationMaterials(
-    int inwardTypeId,
+  Future<void> replaceAllAssignLocationMaterials(
     List<MaterialByInwardTypeModel> items,
   ) async {
     final db = await database;
     final batch = db.batch();
-    batch.delete(
-      'material_assign_location',
-      where: 'inward_type_id = ?',
-      whereArgs: [inwardTypeId],
-    );
+    batch.delete('material_assign_location');
     for (final item in items) {
+      final inwardTypeId = item.inwardTypeId;
+      if (inwardTypeId == null || inwardTypeId <= 0) continue;
       batch.insert(
         'material_assign_location',
         item.toSqliteMap(inwardTypeId),
@@ -478,6 +481,15 @@ class MaterialSqliteService {
       );
     }
     await batch.commit(noResult: true);
+  }
+
+  Future<List<MaterialByInwardTypeModel>> getAllAssignLocationMaterials() async {
+    final db = await database;
+    final rows = await db.query(
+      'material_assign_location',
+      orderBy: 'material_name COLLATE NOCASE ASC',
+    );
+    return rows.map(MaterialByInwardTypeModel.fromSqlite).toList();
   }
 
   Future<List<MaterialByInwardTypeModel>> getAssignLocationMaterials(

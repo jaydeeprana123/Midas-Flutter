@@ -4,6 +4,7 @@ import 'package:midas/Home/Controllers/home_controller.dart';
 import 'package:midas/Shared/Widgets/midas_toolbar_logo.dart';
 import 'package:midas/app/constants/app_assets.dart';
 import 'package:midas/app/constants/app_strings.dart';
+import 'package:midas/app/routes/app_routes.dart';
 import 'package:midas/app/theme/app_text_styles.dart';
 import 'package:midas/app/theme/app_theme.dart';
 
@@ -69,6 +70,14 @@ class HomeView extends GetView<HomeController> {
                                   Get.toNamed(item.route!);
                                 },
                         ),
+                      ),
+                      _DrawerItem(
+                        icon: Icons.tune,
+                        label: AppStrings.frequency,
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          Get.toNamed(AppRoutes.rfidFrequency);
+                        },
                       ),
                       _DrawerItem(
                         icon: Icons.logout,

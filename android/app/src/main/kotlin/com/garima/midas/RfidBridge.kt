@@ -29,7 +29,8 @@ import io.flutter.plugin.common.MethodChannel
  *
  * MethodChannel `com.garima.midas/rfid`      -> connect / disconnect / isConnected /
  *                                               readSingleTag / startInventory /
- *                                               stopInventory / beep
+ *                                               stopInventory / beep /
+ *                                               getFrequency / setFrequency
  * EventChannel  `com.garima.midas/rfid_tags` -> stream of tag ids (trigger + inventory)
  *
  * Everything is wrapped defensively so that on devices without a Chainway reader
@@ -92,6 +93,15 @@ class RfidBridge(
                 val success = (call.argument<Boolean>("success")) ?: true
                 playSound(success)
                 result.success(null)
+            }
+            "getFrequency" -> worker.post {
+                val frequency = readFrequencyMode()
+                mainHandler.post { result.success(frequency) }
+            }
+            "setFrequency" -> worker.post {
+                val frequency = call.argument<Int>("frequency")
+                val ok = frequency != null && writeFrequencyMode(frequency)
+                mainHandler.post { result.success(ok) }
             }
             else -> result.notImplemented()
         }
@@ -197,6 +207,44 @@ class RfidBridge(
             ok
         } catch (t: Throwable) {
             Log.e(TAG, "startInventory failed", t)
+            false
+        }
+    }
+
+    /**
+     * Reads the reader's configured frequency mode via [RFIDWithUHFUART.getFrequencyMode].
+     * Returns null when the reader is not connected or the SDK call fails.
+     */
+    private fun readFrequencyMode(): Int? {
+        val r = reader ?: run {
+            Log.w(TAG, "getFrequency: reader not connected")
+            return null
+        }
+        return try {
+            val mode = r.frequencyMode
+            Log.d(TAG, "getFrequency -> $mode")
+            if (mode < 0) null else mode
+        } catch (t: Throwable) {
+            Log.e(TAG, "getFrequency failed", t)
+            null
+        }
+    }
+
+    /**
+     * Writes a frequency mode with [RFIDWithUHFUART.setFrequencyMode].
+     * Does not start or stop inventory.
+     */
+    private fun writeFrequencyMode(frequency: Int): Boolean {
+        val r = reader ?: run {
+            Log.w(TAG, "setFrequency: reader not connected")
+            return false
+        }
+        return try {
+            val ok = r.setFrequencyMode(frequency)
+            Log.d(TAG, "setFrequency($frequency) -> $ok")
+            ok
+        } catch (t: Throwable) {
+            Log.e(TAG, "setFrequency failed", t)
             false
         }
     }

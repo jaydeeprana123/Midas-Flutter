@@ -70,7 +70,9 @@ import 'package:midas/Auth/Views/splash_view.dart';
 import 'package:midas/Auth/auth_repository.dart';
 import 'package:midas/Auth/system_repository.dart';
 import 'package:midas/Home/Controllers/home_controller.dart';
+import 'package:midas/Home/Controllers/rfid_frequency_controller.dart';
 import 'package:midas/Home/Views/home_view.dart';
+import 'package:midas/Home/Views/rfid_frequency_view.dart';
 import 'package:midas/Shared/Services/api_client.dart';
 import 'package:midas/Shared/Services/device_service.dart';
 import 'package:midas/Shared/Services/job_card_download_service.dart';
@@ -120,6 +122,17 @@ class AppPages {
             authRepository: Get.find<AuthRepository>(),
             secureStorage: Get.find<SecureStorageService>(),
             apiClient: Get.find<ApiClient>(),
+          ),
+        );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.rfidFrequency,
+      page: () => const RfidFrequencyView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(
+          () => RfidFrequencyController(
+            rfidService: Get.find<RfidService>(),
           ),
         );
       }),
